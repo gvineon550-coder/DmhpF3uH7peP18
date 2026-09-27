@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
+<meta name="theme-color" content="#0a0e1a">
+<style>
+
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0e1a; --panel:rgba(22,27,42,0.72); --panel2:rgba(30,36,55,0.55);
+  --border:rgba(148,163,184,0.12); --text:#e8eaf0; --muted:#8892a6;
+  --accent:#60a5fa; --accent2:#a78bfa; --good:#4ade80; --bad:#f87171; --warn:#facc15;
+}
+[data-theme="light"]{
+  --bg:#f4f6fa; --panel:rgba(255,255,255,0.75); --panel2:rgba(255,255,255,0.6);
+  --border:rgba(15,23,42,0.08); --text:#0f172a; --muted:#64748b;
+  --accent:#2563eb; --accent2:#7c3aed;
+}
+html,body{overflow-x:hidden}
+body{
+  font-family:-apple-system,'Inter','Segoe UI',Roboto,sans-serif;
+  color:var(--text); background:var(--bg); min-height:100vh; padding:20px;
+  transition:background-color .5s,color .5s; position:relative; line-height:1.4;
+}
+body::before{
+  content:''; position:fixed; inset:0; z-index:-1;
+  background:
+    radial-gradient(circle at 15% -5%, rgba(96,165,250,0.14), transparent 45%),
+    radial-gradient(circle at 85% 100%, rgba(167,139,250,0.10), transparent 45%);
+  background-attachment:fixed; transition:background 1.5s;
+}
+body.kind-sun::before{background:radial-gradient(circle at 20% -5%, rgba(251,191,36,0.18), transparent 45%),radial-gradient(circle at 80% 100%, rgba(96,165,250,0.08), transparent 45%);background-attachment:fixed}
+body.kind-rain::before{background:radial-gradient(circle at 20% -5%, rgba(96,165,250,0.18), transparent 45%),radial-gradient(circle at 80% 100%, rgba(51,65,85,0.2), transparent 45%);background-attachment:fixed}
+body.kind-snow::before{background:radial-gradient(circle at 20% -5%, rgba(200,220,255,0.2), transparent 45%),radial-gradient(circle at 80% 100%, rgba(167,139,250,0.1), transparent 45%);background-attachment:fixed}
+body.kind-storm::before{background:radial-gradient(circle at 20% -5%, rgba(120,53,15,0.25), transparent 45%),radial-gradient(circle at 80% 100%, rgba(96,165,250,0.15), transparent 45%);background-attachment:fixed}
+body.aurora::after{
+  content:''; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background:linear-gradient(180deg, rgba(74,222,128,0.08) 0%, transparent 40%);
+  animation:auroraShift 8s ease-in-out infinite;
+}
+@keyframes auroraShift{0%,100%{opacity:0.4}50%{opacity:0.9}}
+[data-theme="light"] body::before{background:radial-gradient(circle at 15% -5%, rgba(37,99,235,0.10), transparent 45%),radial-gradient(circle at 85% 100%, rgba(124,58,237,0.07), transparent 45%);background-attachment:fixed}
+#bgCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;opacity:0.55}
+.wrap{max-width:1400px;margin:0 auto;position:relative;z-index:1}
+
+.header{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:20px;flex-wrap:wrap}
+.header-left h1{font-size:28px;font-weight:600;letter-spacing:-0.02em;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.header-left .date-line{color:var(--muted);font-size:14px;margin-top:4px}
+.header-left .date-line .wd{color:var(--accent);font-weight:500}
+.header-right{display:flex;gap:8px}
+.icon-btn{background:var(--panel);border:1px solid var(--border);color:var(--text);width:44px;height:44px;border-radius:12px;cursor:pointer;font-size:17px;backdrop-filter:blur(20px);transition:transform .2s}
+.icon-btn:hover{transform:scale(1.08) rotate(8deg)}
+
+.bento{display:grid;grid-template-columns:repeat(12,1fr);gap:14px;margin-bottom:20px}
+@media(max-width:1000px){.bento{grid-template-columns:repeat(6,1fr)}}
+@media(max-width:640px){.bento{grid-template-columns:1fr}.bento>*{grid-column:1!important}}
+
+.card{background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:20px;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);position:relative;overflow:hidden;transition:border-color .2s,transform .2s;animation:fadeInUp .5s ease-out both}
+.card:hover{border-color:rgba(96,165,250,0.3);transform:translateY(-2px)}
+.card h3{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:14px;font-weight:600;display:flex;align-items:center;gap:6px}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.empty{color:var(--muted);font-size:13px;text-align:center;padding:12px}
+
+.card-clock{grid-column:span 4;min-height:220px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:30px 24px}
+.card-weather{grid-column:span 4}
+.card-iss{grid-column:span 4}
+.card-kp{grid-column:span 4}
+.card-aq{grid-column:span 4}
+.card-uv{grid-column:span 4}
+.card-currency{grid-column:span 3}
+.card-crypto{grid-column:span 3}
+.card-news{grid-column:span 6;grid-row:span 2}
+.card-calendar{grid-column:span 3}
+.card-art{grid-column:span 3;padding:0;min-height:220px}
+.card-gh{grid-column:span 3}
+.card-moon{grid-column:span 3;text-align:center}
+.card-ny{grid-column:span 3;text-align:center}
+.card-track{grid-column:span 3}
+.card-eq{grid-column:span 6}
+.card-history{grid-column:span 6}
+.card-quote{grid-column:span 12}
+
+@media(max-width:1000px){
+  .card-clock,.card-weather,.card-iss,.card-kp,.card-aq,.card-uv{grid-column:span 6}
+  .card-currency,.card-crypto,.card-calendar,.card-art,.card-gh,.card-moon,.card-ny,.card-track{grid-column:span 3}
+  .card-news,.card-eq,.card-history,.card-quote{grid-column:span 6}
+}
+
+.clock{font-size:clamp(56px,10vw,88px);font-weight:200;letter-spacing:-0.05em;line-height:0.95;font-variant-numeric:tabular-nums;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.clock .colon{animation:blink 1s steps(1) infinite;opacity:0.7}
+@keyframes blink{50%{opacity:0.25}}
+.clock .sec{font-size:0.42em;color:var(--accent);-webkit-text-fill-color:var(--accent);margin-left:8px;opacity:0.75;font-variant-numeric:tabular-nums}
+.tz{font-size:12px;color:var(--muted);margin-top:6px;letter-spacing:0.4px}
+
+.counters{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border);width:100%}
+.cnt{text-align:center;font-size:11px}
+.cnt span{display:block;font-size:18px;font-weight:500;color:var(--accent);font-variant-numeric:tabular-nums;margin-bottom:2px}
+.cnt small{color:var(--muted);font-size:9px}
+
+.wx-hero{display:flex;align-items:center;gap:16px;margin-bottom:14px}
+.wx-icon{font-size:52px;line-height:1;filter:drop-shadow(0 4px 16px rgba(96,165,250,0.25))}
+.wx-temp{font-size:38px;font-weight:200;letter-spacing:-0.02em;line-height:1}
+.wx-feels{font-size:12px;color:var(--muted);margin-top:2px}
+.wx-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding-top:12px;border-top:1px solid var(--border)}
+.wx-item{text-align:center;font-size:12px}
+.wx-item span{display:block;font-size:16px;margin-bottom:2px}
+.wx-item b{font-weight:500}
+.wx-item small{color:var(--muted);font-size:10px;display:block}
+.wx-sun{display:flex;justify-content:space-around;padding:10px 0;margin-top:10px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)}
+.wx-sun span{margin-right:4px}
+.wx-forecast{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.fc-day{text-align:center}
+.fc-date{font-size:10px;color:var(--muted);margin-bottom:4px}
+.fc-icon{font-size:22px;margin-bottom:4px}
+.fc-temps{font-size:11px;display:flex;flex-direction:column;gap:2px}
+.fc-max{font-weight:500}
+.fc-min{color:var(--muted);font-size:10px}
+
+.cur-row{display:flex;align-items:center;gap:8px;padding:7px 0;font-size:13px}
+.cur-row + .cur-row{border-top:1px solid var(--border)}
+.cur-flag{font-size:18px;flex-shrink:0}
+.cur-code{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:0.5px;min-width:32px}
+.cur-val{margin-left:auto;font-variant-numeric:tabular-nums;font-weight:500}
+.cur-chg{font-size:10px;font-variant-numeric:tabular-nums}
+
+.news-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:600px){.news-grid{grid-template-columns:1fr}}
+.news-card{display:block;padding:12px 14px;background:var(--panel2);border:1px solid var(--border);border-radius:12px;color:var(--text);text-decoration:none;transition:transform .15s,border-color .15s}
+.news-card:hover{transform:translateY(-2px);border-color:var(--accent)}
+.news-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.news-source{font-size:10px;font-weight:600;color:var(--accent);letter-spacing:0.6px;text-transform:uppercase}
+.news-ago{font-size:10px;color:var(--muted)}
+.news-title{font-size:14px;font-weight:500;line-height:1.35;margin-bottom:4px}
+.news-card:hover .news-title{color:var(--accent)}
+.news-desc{font-size:11px;color:var(--muted);line-height:1.45;margin-top:4px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+
+.cal-month{font-size:14px;font-weight:500;text-align:center;margin-bottom:10px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-head{font-size:10px;color:var(--muted);text-align:center;padding:3px 0;font-weight:600}
+.cal-cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:11px;border-radius:6px;font-variant-numeric:tabular-nums;position:relative}
+.cal-empty{opacity:0.2}
+.cal-weekend{color:var(--muted)}
+.cal-today{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:600;box-shadow:0 0 14px rgba(96,165,250,0.35)}
+.cal-hol{position:absolute;top:1px;right:3px;font-size:8px;color:var(--bad);line-height:1}
+
+.card-art svg{width:100%;height:100%;display:block}
+.art-label{position:absolute;bottom:10px;right:12px;font-size:10px;color:rgba(255,255,255,0.6);background:rgba(0,0,0,0.35);padding:4px 10px;border-radius:12px;backdrop-filter:blur(8px)}
+
+.moon-icon{font-size:52px;line-height:1;display:block;margin-bottom:8px;filter:drop-shadow(0 0 20px rgba(167,139,250,0.5))}
+.moon-name{font-size:11px;color:var(--muted)}
+.ny-num{font-size:44px;font-weight:200;letter-spacing:-0.03em;background:linear-gradient(135deg,#f87171,#facc15);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
+.ny-label{font-size:11px;color:var(--muted);margin-top:6px}
+
+.quote-text{font-size:15px;font-style:italic;line-height:1.5;margin-bottom:8px}
+.quote-author{font-size:12px;color:var(--muted);text-align:right}
+.quote-author::before{content:'— '}
+
+.iss-hero{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.iss-icon{font-size:44px;line-height:1;filter:drop-shadow(0 4px 16px rgba(96,165,250,0.4));animation:issFloat 4s ease-in-out infinite}
+@keyframes issFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.iss-dist{font-size:22px;font-weight:300;color:var(--accent);font-variant-numeric:tabular-nums}
+.iss-dist-unit{font-size:12px;color:var(--muted)}
+.iss-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.iss-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);padding-top:10px;border-top:1px solid var(--border)}
+
+.kp-hero{text-align:center;margin-bottom:10px}
+.kp-value{font-size:44px;font-weight:200;letter-spacing:-0.03em;line-height:1;font-variant-numeric:tabular-nums}
+.kp-label{font-size:11px;color:var(--muted);margin-top:2px}
+.kp-level{text-align:center;font-size:13px;font-weight:500;margin-bottom:10px}
+.kp-bars{display:flex;gap:3px;align-items:flex-end;height:40px;padding:6px;background:var(--panel2);border-radius:8px}
+.kp-bar{flex:1;background:linear-gradient(180deg,var(--accent),var(--accent2));border-radius:3px;min-height:4px;opacity:0.7}
+.kp-axis{display:flex;justify-content:space-between;font-size:9px;color:var(--muted);margin-top:4px}
+
+.aq-hero{text-align:center;margin-bottom:10px}
+.aq-value{font-size:44px;font-weight:200;letter-spacing:-0.03em;line-height:1;font-variant-numeric:tabular-nums}
+.aq-label{font-size:11px;color:var(--muted);margin-top:2px}
+.aq-level{text-align:center;font-size:13px;font-weight:500;margin-bottom:12px}
+.aq-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;text-align:center}
+.aq-meta b{display:block;color:var(--muted);font-size:10px;font-weight:600;letter-spacing:0.5px;margin-bottom:2px}
+
+.eq-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px}
+.eq-row:last-child{border-bottom:none}
+.eq-mag{font-weight:600;font-size:14px;min-width:36px;font-variant-numeric:tabular-nums}
+.eq-place{flex:1;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.eq-meta{color:var(--muted);font-size:11px;white-space:nowrap}
+
+.hist-row{display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);text-decoration:none;color:var(--text);transition:transform .15s}
+.hist-row:last-child{border-bottom:none}
+.hist-row:hover{transform:translateX(4px)}
+.hist-row:hover .hist-text{color:var(--accent)}
+.hist-year{font-weight:600;color:var(--accent2);font-size:13px;min-width:46px;font-variant-numeric:tabular-nums}
+.hist-text{flex:1;font-size:12px;line-height:1.4}
+
+.gh-block{text-align:center}
+.gh-title{font-size:12px;font-weight:600;color:var(--accent);margin-bottom:10px;letter-spacing:0.5px}
+.gh-row{font-size:13px;color:var(--muted);padding:4px 0}
+.gh-row b{color:var(--text);font-variant-numeric:tabular-nums;font-weight:500}
+
+.track-card{display:flex;align-items:center;gap:12px;padding:10px;background:var(--panel2);border:1px solid var(--border);border-radius:12px;text-decoration:none;color:var(--text);transition:transform .15s,border-color .15s}
+.track-card:hover{transform:translateY(-2px);border-color:var(--accent)}
+.track-icon{font-size:28px;line-height:1}
+.track-info{flex:1;min-width:0}
+.track-name{font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.track-artist{font-size:11px;color:var(--muted);margin-top:2px}
+
+.holiday{grid-column:span 12;text-align:center;padding:12px 20px;background:linear-gradient(135deg,rgba(255,193,7,0.15),rgba(255,87,34,0.12));border:1px solid rgba(255,193,7,0.3);border-radius:16px;font-size:15px;font-weight:500;animation:holidayPulse 3s ease-in-out infinite}
+@keyframes holidayPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,193,7,0.3)}50%{box-shadow:0 0 30px 4px rgba(255,193,7,0.18)}}
+
+.footer{text-align:center;font-size:11px;color:var(--muted);padding:24px 0 8px}
+
+.splash{position:fixed;inset:0;background:var(--bg);z-index:1000;display:flex;align-items:center;justify-content:center;font-size:52px;animation:splashOut 0.9s ease-out 1s forwards;pointer-events:none}
+@keyframes splashOut{to{opacity:0;visibility:hidden}}
+
+</style>
+</head>
+<body class="kind-storm">
+
+<div class="splash">✨</div>
+<canvas id="bgCanvas"></canvas>
+
+<div class="wrap">
+
+<div class="header">
+  <div class="header-left">
+    <h1>Dashboard</h1>
+    <div class="date-line">
+      <span class="wd">Воскресенье</span>, 27 сентября · 2026
+    </div>
+  </div>
+  <div class="header-right">
+    <button class="icon-btn" id="soundBtn" title="Звук часов">🔇</button>
+    <button class="icon-btn" id="themeBtn" title="Тема">☀</button>
+  </div>
+</div>
+
+<div class="bento">
+
+
+
+  <div class="card card-clock">
+    <div class="clock">
+      <span id="h1">-</span><span id="h2">-</span><span class="colon">:</span><span id="m1">-</span><span id="m2">-</span><span class="sec" id="ss">--</span>
+    </div>
+    <div class="tz">Московское время · UTC+3</div>
+    <div class="counters">
+      <div class="cnt"><span id="cnt-day">0</span><small>секунд с начала дня</small></div>
+      <div class="cnt"><span id="cnt-year">0</span><small>дней с начала года</small></div>
+      <div class="cnt"><span id="cnt-left">0</span><small>дней до конца года</small></div>
+    </div>
+  </div>
+
+  <div class="card card-weather">
+    <h3>🌤 Погода · Нальчик</h3>
+    <div class="wx-hero"><div class="wx-icon">⛈️</div><div><div class="wx-temp">16°</div><div class="wx-feels">ощущается 15°</div></div></div><div class="wx-meta"><div class="wx-item"><span>💧</span><b>72%</b></div><div class="wx-item"><span>💨</span><b>4</b><small>км/ч</small></div><div class="wx-item"><span>🔽</span><b>1018</b><small>мм</small></div></div><div class="wx-sun"><div><span>🌅</span> 05:58 AM</div><div><span>🌇</span> 05:54 PM</div></div><div class="wx-forecast"><div class="fc-day"><div class="fc-date">09.27</div><div class="fc-icon">⛈️</div><div class="fc-temps"><span class="fc-max">↑18°</span><span class="fc-min">↓11°</span></div></div><div class="fc-day"><div class="fc-date">09.28</div><div class="fc-icon">⛈️</div><div class="fc-temps"><span class="fc-max">↑17°</span><span class="fc-min">↓10°</span></div></div><div class="fc-day"><div class="fc-date">09.29</div><div class="fc-icon">⛈️</div><div class="fc-temps"><span class="fc-max">↑11°</span><span class="fc-min">↓8°</span></div></div></div>
+  </div>
+
+  <div class="card card-iss">
+    <h3>🛰 МКС прямо сейчас</h3>
+    <div class="iss-hero"><div class="iss-icon">🛰</div><div><div class="iss-dist">1549 <span class="iss-dist-unit">км от тебя</span></div><div class="iss-sub">высота 425 км · 27587 км/ч</div></div></div><div class="iss-meta"><span>📍 45.98°, 62.96°</span><span>👁 daylight</span></div>
+  </div>
+
+  <div class="card card-kp">
+    <h3>🌌 Магнитное поле</h3>
+    <div class="empty">—</div>
+  </div>
+
+  <div class="card card-aq">
+    <h3>🌬 Воздух</h3>
+    <div class="aq-hero"><div class="aq-value" style="color:#86efac">33</div><div class="aq-label">AQI</div></div><div class="aq-level" style="color:#86efac">Хороший</div><div class="aq-meta"><div><b>PM2.5</b> 11.6</div><div><b>PM10</b> 23.6</div></div>
+  </div>
+
+  <div class="card card-uv">
+    <h3>🌡 УФ-индекс</h3>
+    <div class="aq-hero"><div class="aq-value" style="color:#4ade80">0.8</div><div class="aq-label">УФ</div></div><div class="aq-level" style="color:#4ade80">Низкий</div><div class="aq-meta"><div><b>Макс.</b> 4</div></div>
+  </div>
+
+  <div class="card card-currency">
+    <h3>💱 Курсы ЦБ</h3>
+    <div class="cur-row"><span class="cur-flag">🇺🇸</span><span class="cur-code">USD</span><span class="cur-val">84.34 ₽</span></div><div class="cur-row"><span class="cur-flag">🇪🇺</span><span class="cur-code">EUR</span><span class="cur-val">95.87 ₽</span></div><div class="cur-row"><span class="cur-flag">🇨🇳</span><span class="cur-code">CNY</span><span class="cur-val">12.54 ₽</span></div>
+  </div>
+
+  <div class="card card-crypto">
+    <h3>💰 Крипта</h3>
+    <div class="cur-row"><span class="cur-flag">₿</span><span class="cur-code">BTC</span><span class="cur-val">$84,875</span><span class="cur-chg" style="color:var(--good)">▲ 1.1%</span></div><div class="cur-row"><span class="cur-flag">Ξ</span><span class="cur-code">ETH</span><span class="cur-val">$2,705</span><span class="cur-chg" style="color:var(--good)">▲ 0.7%</span></div><div class="cur-row"><span class="cur-flag">💎</span><span class="cur-code">TON</span><span class="cur-val">$1.6</span><span class="cur-chg" style="color:var(--good)">▲ 8.4%</span></div>
+  </div>
+
+  <div class="card card-news">
+    <h3>📰 Новости · 5 источников</h3>
+    <div class="news-grid">
+        <a class="news-card" href="https://tass.ru/proisshestviya/28156285" target="_blank" rel="noopener">
+          <div class="news-head">
+            <span class="news-source">TASS</span>
+            <span class="news-ago">только что</span>
+          </div>
+          <div class="news-title">В Тверской области при пожаре в жилом доме погибли три человека</div>
+          <div class="news-desc">Пожар тушили 13 человек личного состава и 5 единиц техники</div>
+        </a>
+        <a class="news-card" href="https://www.rbc.ru/rbcfreenews/6ab91aa7ece575df98386a57" target="_blank" rel="noopener">
+          <div class="news-head">
+            <span class="news-source">RBC</span>
+            <span class="news-ago">5 мин</span>
+          </div>
+          <div class="news-title">В Черногории арестовали двух россиян по подозрению в контрабанде</div>
+          <div class="news-desc">Суд в черногорском Которе заключил под стражу на срок до 30 дней граждан России Александра Круглянского и Александру Круглянску...</div>
+        </a>
+        <a class="news-card" href="https://lenta.ru/news/2026/09/27/kolobkov-prokommentiroval-prodlenie-otstraneniya-federatsii-shahmat-rossii/" target="_blank" rel="noopener">
+          <div class="news-head">
+            <span class="news-source">Lenta</span>
+            <span class="news-ago">5 мин</span>
+          </div>
+          <div class="news-title">Колобков прокомментировал продление отстранения Федерации шахмат России</div>
+          
+        </a>
+        <a class="news-card" href="https://lenta.ru/news/2026/09/27/vuchich-vyskazalsya-o-sanktsiyah-protiv-rossii/" target="_blank" rel="noopener">
+          <div class="news-head">
+            <span class="news-source">Lenta</span>
+            <span class="news-ago">5 мин</span>
+          </div>
+          <div class="news-title">Вучич высказался о санкциях против России</div>
+          
+        </a>
+        <a class="news-card" href="https://lenta.ru/news/2026/09/27/na-ukraine-rezko-osudili-zelenskogo-posle-ubiystva-monaha-v-polshe/" target="_blank" rel="noopener">
+          <div class="news-head">
+            <span class="news-source">Lenta</span>
+            <span class="news-ago">9 мин</span>
+          </div>
+          <div class="news-title">На Украине резко осудили Зеленского после убийства монаха в Польше</div>
+          
+        </a>
+        <a class="news-card" href="https://lenta.ru/news/2026/09/27/v-turtsii-namereny-sdelat-tursezon-kruglogodichnym/" target="_blank" rel="noopener">
+          <div class="news-head">
+            <span class="news-source">Lenta</span>
+            <span class="news-ago">10 мин</span>
+          </div>
+          <div class="news-title">В Турции запланировали сделать турсезон круглогодичным</div>
+          
+        </a>
+        <a class="news-card" href="https://tass.ru/proisshestviya/28156281" target="_blank" rel="noopener">
+          <div class="news-head">
+            <span class="news-source">TASS</span>
+            <span class="news-ago">12 мин</span>
+          </div>
+          <div class="news-title">В Британии около авиабазы США задержали подозреваемых в подготовке теракта</div>
+          <div class="news-desc">Следствие пытается установить, связаны ли пятеро задержанных мужчин с Ираном, пишет The Times</div>
+        </a>
+        <a class="news-card" href="https://tass.ru/sport/28156279" target="_blank" rel="noopener">
+          <div class="news-head">
+            <span class="news-source">TASS</span>
+            <span class="news-ago">15 мин</span>
+          </div>
+          <div class="news-title">Филатов иронично отреагировал на голосование Украины против своего кандидата</div>
+          <div class="news-desc">На генассамблее FIDE Федерация шахмат Украины высказала претензию новому главе международной организации Тимуру Турлову за вклю...</div>
+        </a>
+        <a class="news-card" href="https://www.rbc.ru/technology_and_media/27/09/2026/6ab90499561554cf7a38203f" target="_blank" rel="noopener">
+          <div class="news-head">
+            <span class="news-source">RBC</span>
+            <span class="news-ago">16 мин</span>
+          </div>
+          <div class="news-title">FT назвала барьеры для инвестиций в ИИ в Европе</div>
+          <div class="news-desc">Европе мешают конкурировать с США в сфере ИИ сложное регулирование, дорогая энергия, нехватка дата-центров и финансирования, а ...</div>
+        </a>
+        <a class="news-card" href="https://tass.ru/mezhdunarodnaya-panorama/28156275" target="_blank" rel="noopener">
+          <div class="news-head">
+            <span class="news-source">TASS</span>
+            <span class="news-ago">16 мин</span>
+          </div>
+          <div class="news-title">Bild: 18 стран ЕС согласовали план по борьбе с наплывом мигрантов на границах</div>
+          <div class="news-desc">Автором разработки кризисного механизма стал глава МВД Германии Александер Добриндт, пишет газета</div>
+        </a>
+        <a class="news-card" href="https://tass.ru/sport/28156277" target="_blank" rel="noopener">
+          <div class="news-head">
+            <span class="news-source">TASS</span>
+            <span class="news-ago">21 мин</span>
+          </div>
+          <div class="news-title">Фигуристы Рыбакова и Махноносов выступят на турнире в Грузии</div>
+          <div class="news-desc">Ранее стало известно, что в соревнованиях не смогут принять участие Варвара Жданова и Тимур Бабаев-Смирнов</div>
+        </a>
+        <a class="news-card" href="https://lenta.ru/news/2026/09/27/rossiyanam-dali-sovety-po-proverke-batarey-pered-nachalom-otopitelnogo-sezona/" target="_blank" rel="noopener">
+          <div class="news-head">
+            <span class="news-source">Lenta</span>
+            <span class="news-ago">22 мин</span>
+          </div>
+          <div class="news-title">Россиянам дали советы по проверке батарей перед началом отопительного сезона</div>
+          
+        </a></div>
+  </div>
+
+  <div class="card card-calendar">
+    <h3>📅 Сентябрь 2026</h3>
+    <div class="cal-month">Сентябрь 2026</div><div class="cal-grid"><div class="cal-head">Пн</div><div class="cal-head">Вт</div><div class="cal-head">Ср</div><div class="cal-head">Чт</div><div class="cal-head">Пт</div><div class="cal-head">Сб</div><div class="cal-head">Вс</div><div class="cal-cell cal-empty"></div><div class="cal-cell" title="📚 День знаний">1<span class="cal-hol">•</span></div><div class="cal-cell">2</div><div class="cal-cell">3</div><div class="cal-cell">4</div><div class="cal-cell cal-weekend">5</div><div class="cal-cell cal-weekend">6</div><div class="cal-cell">7</div><div class="cal-cell">8</div><div class="cal-cell">9</div><div class="cal-cell">10</div><div class="cal-cell">11</div><div class="cal-cell cal-weekend">12</div><div class="cal-cell cal-weekend">13</div><div class="cal-cell">14</div><div class="cal-cell">15</div><div class="cal-cell">16</div><div class="cal-cell">17</div><div class="cal-cell">18</div><div class="cal-cell cal-weekend">19</div><div class="cal-cell cal-weekend">20</div><div class="cal-cell">21</div><div class="cal-cell">22</div><div class="cal-cell">23</div><div class="cal-cell">24</div><div class="cal-cell">25</div><div class="cal-cell cal-weekend">26</div><div class="cal-cell cal-today">27</div><div class="cal-cell">28</div><div class="cal-cell">29</div><div class="cal-cell">30</div></div>
+  </div>
+
+  <div class="card card-art">
+    <svg viewBox="0 0 400 240" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><filter id="b724774"><feGaussianBlur stdDeviation="26"/></filter><radialGradient id="v724774" cx="50%" cy="50%" r="70%"><stop offset="60%" stop-color="rgba(0,0,0,0)"/><stop offset="100%" stop-color="rgba(0,0,0,0.55)"/></radialGradient></defs><rect width="400" height="240" fill="#0a0e1a"/><g filter="url(#b724774)"><circle cx="368" cy="69" r="144" fill="#38f9d7" opacity="0.50"/><circle cx="193" cy="10" r="107" fill="#43e97b" opacity="0.42"/><circle cx="337" cy="117" r="74" fill="#4facfe" opacity="0.31"/><circle cx="241" cy="111" r="109" fill="#4facfe" opacity="0.50"/><circle cx="86" cy="160" r="93" fill="#38f9d7" opacity="0.41"/><circle cx="377" cy="154" r="156" fill="#38f9d7" opacity="0.65"/><circle cx="108" cy="107" r="144" fill="#38f9d7" opacity="0.69"/></g><line x1="368" y1="75" x2="54" y2="150" stroke="white" stroke-width="0.4" opacity="0.17"/><line x1="122" y1="165" x2="158" y2="5" stroke="white" stroke-width="1.0" opacity="0.13"/><line x1="53" y1="195" x2="246" y2="218" stroke="white" stroke-width="0.7" opacity="0.10"/><line x1="237" y1="213" x2="286" y2="134" stroke="white" stroke-width="1.0" opacity="0.24"/><line x1="170" y1="149" x2="57" y2="119" stroke="white" stroke-width="0.4" opacity="0.12"/><line x1="383" y1="119" x2="38" y2="98" stroke="white" stroke-width="0.4" opacity="0.14"/><line x1="273" y1="129" x2="182" y2="131" stroke="white" stroke-width="0.4" opacity="0.26"/><line x1="128" y1="233" x2="222" y2="38" stroke="white" stroke-width="0.8" opacity="0.16"/><line x1="84" y1="209" x2="279" y2="189" stroke="white" stroke-width="0.5" opacity="0.23"/><line x1="24" y1="34" x2="254" y2="149" stroke="white" stroke-width="0.7" opacity="0.15"/><circle cx="266" cy="64" r="0.7" fill="white" opacity="0.55"/><circle cx="110" cy="92" r="1.8" fill="white" opacity="0.36"/><circle cx="296" cy="238" r="1.1" fill="white" opacity="0.41"/><circle cx="318" cy="55" r="0.6" fill="white" opacity="0.45"/><circle cx="233" cy="173" r="0.8" fill="white" opacity="0.66"/><circle cx="107" cy="0" r="1.1" fill="white" opacity="0.35"/><circle cx="117" cy="215" r="1.6" fill="white" opacity="0.38"/><circle cx="167" cy="83" r="0.8" fill="white" opacity="0.67"/><circle cx="124" cy="206" r="0.5" fill="white" opacity="0.39"/><circle cx="139" cy="215" r="0.7" fill="white" opacity="0.32"/><circle cx="237" cy="34" r="0.7" fill="white" opacity="0.37"/><circle cx="135" cy="183" r="0.7" fill="white" opacity="0.26"/><circle cx="321" cy="27" r="1.0" fill="white" opacity="0.27"/><circle cx="88" cy="198" r="1.0" fill="white" opacity="0.43"/><circle cx="350" cy="4" r="1.5" fill="white" opacity="0.28"/><circle cx="377" cy="224" r="0.9" fill="white" opacity="0.52"/><circle cx="374" cy="163" r="0.8" fill="white" opacity="0.59"/><circle cx="162" cy="103" r="1.1" fill="white" opacity="0.31"/><circle cx="202" cy="159" r="0.8" fill="white" opacity="0.51"/><circle cx="213" cy="44" r="1.5" fill="white" opacity="0.64"/><circle cx="255" cy="208" r="0.7" fill="white" opacity="0.68"/><circle cx="29" cy="70" r="1.4" fill="white" opacity="0.61"/><circle cx="200" cy="228" r="1.2" fill="white" opacity="0.25"/><circle cx="28" cy="148" r="1.4" fill="white" opacity="0.20"/><circle cx="358" cy="64" r="1.0" fill="white" opacity="0.41"/><circle cx="271" cy="6" r="1.0" fill="white" opacity="0.25"/><circle cx="280" cy="51" r="1.6" fill="white" opacity="0.34"/><circle cx="253" cy="113" r="0.9" fill="white" opacity="0.36"/><circle cx="345" cy="227" r="1.2" fill="white" opacity="0.24"/><circle cx="296" cy="30" r="0.9" fill="white" opacity="0.58"/><circle cx="177" cy="68" r="1.0" fill="white" opacity="0.69"/><circle cx="233" cy="106" r="0.8" fill="white" opacity="0.66"/><circle cx="131" cy="92" r="1.9" fill="white" opacity="0.38"/><circle cx="204" cy="133" r="0.6" fill="white" opacity="0.24"/><circle cx="365" cy="28" r="1.9" fill="white" opacity="0.34"/><circle cx="80" cy="147" r="1.7" fill="white" opacity="0.28"/><circle cx="175" cy="142" r="0.8" fill="white" opacity="0.30"/><circle cx="159" cy="63" r="1.8" fill="white" opacity="0.22"/><circle cx="181" cy="142" r="1.2" fill="white" opacity="0.46"/><circle cx="254" cy="43" r="1.1" fill="white" opacity="0.45"/><circle cx="343" cy="0" r="1.2" fill="white" opacity="0.37"/><circle cx="124" cy="227" r="1.8" fill="white" opacity="0.61"/><circle cx="293" cy="33" r="1.5" fill="white" opacity="0.40"/><circle cx="262" cy="99" r="1.3" fill="white" opacity="0.67"/><circle cx="297" cy="86" r="1.4" fill="white" opacity="0.55"/><circle cx="357" cy="67" r="0.6" fill="white" opacity="0.28"/><circle cx="193" cy="224" r="0.9" fill="white" opacity="0.27"/><circle cx="399" cy="71" r="1.3" fill="white" opacity="0.50"/><circle cx="179" cy="130" r="0.7" fill="white" opacity="0.56"/><circle cx="75" cy="50" r="1.5" fill="white" opacity="0.54"/><rect width="400" height="240" fill="url(#v724774)"/></svg>
+    <div class="art-label">🎨 по погоде</div>
+  </div>
+
+  <div class="card card-gh">
+    
+  </div>
+
+  <div class="card card-moon">
+    <h3>🌕 Луна</h3>
+    <span class="moon-icon">🌖</span>
+    <div class="moon-name">Убывающая луна</div>
+  </div>
+
+  <div class="card card-ny">
+    <h3>🎄 До НГ</h3>
+    <div class="ny-num">96</div>
+    <div class="ny-label">дней</div>
+  </div>
+
+  <div class="card card-track">
+    <h3>🎵 Атмосфера дня</h3>
+    <a class="track-card" href="https://www.youtube.com/results?search_query=AC/DC+Thunderstruck" target="_blank" rel="noopener"><div class="track-icon">🎵</div><div class="track-info"><div class="track-name">Thunderstruck</div><div class="track-artist">AC/DC</div></div></a>
+  </div>
+
+  <div class="card card-eq">
+    <h3>🌍 Землетрясения рядом</h3>
+    <div class="eq-row"><span class="eq-mag" style="color:#facc15">M4.1</span><span class="eq-place">16 km SSW of Vardane, Russia</span><span class="eq-meta">335 км · 2 дн</span></div><div class="eq-row"><span class="eq-mag" style="color:#fb923c">M5.3</span><span class="eq-place">15 km SSW of Hilvan, Turkey</span><span class="eq-meta">781 км · 3 дн</span></div><div class="eq-row"><span class="eq-mag" style="color:#facc15">M4.4</span><span class="eq-place">28 km SSE of Borūjen, Iran</span><span class="eq-meta">1476 км · 4 дн</span></div>
+  </div>
+
+  <div class="card card-history">
+    <h3>📖 Сегодня в истории</h3>
+    <a class="hist-row" href="https://ru.wikipedia.org/wiki/1997_%D0%B3%D0%BE%D0%B4" target="_blank" rel="noopener"><span class="hist-year">1997</span><span class="hist-text">последний сеанс связи с аппаратом Mars Pathfinder на поверхности Марса.</span></a><a class="hist-row" href="https://ru.wikipedia.org/wiki/1977_%D0%B3%D0%BE%D0%B4" target="_blank" rel="noopener"><span class="hist-year">1977</span><span class="hist-text">первый ток дала Чернобыльская АЭС — первая атомная электростанция Украины.</span></a><a class="hist-row" href="https://ru.wikipedia.org/wiki/1962_%D0%B3%D0%BE%D0%B4" target="_blank" rel="noopener"><span class="hist-year">1962</span><span class="hist-text">целиком опубликована книга Рейчел Карсон «Безмолвная весна».</span></a><a class="hist-row" href="https://ru.wikipedia.org/wiki/1940_%D0%B3%D0%BE%D0%B4" target="_blank" rel="noopener"><span class="hist-year">1940</span><span class="hist-text">Германия, Италия и Япония подписали Тройственный пакт.</span></a><a class="hist-row" href="https://ru.wikipedia.org/wiki/1905_%D0%B3%D0%BE%D0%B4" target="_blank" rel="noopener"><span class="hist-year">1905</span><span class="hist-text">в редакцию журнала Annalen der Physik поступила статья Эйнштейна с уравнением E = mc².</span></a>
+  </div>
+
+  <div class="card card-quote">
+    <h3>💭 Цитата дня</h3>
+    <div class="quote-text">«Самый тёмный час — перед рассветом.»</div>
+    <div class="quote-author">Пауло Коэльо</div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Обновлено 13:57 МСК · обновляется каждый час
+</div>
+
+</div>
+
+<script>
+
+(function(){
+  function tick(){
+    const now = new Date();
+    const msk = new Date(now.toLocaleString('en-US', {timeZone:'Europe/Moscow'}));
+    const hh = String(msk.getHours()).padStart(2, '0');
+    const mm = String(msk.getMinutes()).padStart(2, '0');
+    const ss = String(msk.getSeconds()).padStart(2, '0');
+    document.getElementById('h1').textContent = hh[0];
+    document.getElementById('h2').textContent = hh[1];
+    document.getElementById('m1').textContent = mm[0];
+    document.getElementById('m2').textContent = mm[1];
+    document.getElementById('ss').textContent = ss;
+  }
+  tick();
+  setInterval(tick, 1000);
+
+  function counters(){
+    const now = new Date();
+    const msk = new Date(now.toLocaleString('en-US', {timeZone:'Europe/Moscow'}));
+    const daySec = msk.getHours()*3600 + msk.getMinutes()*60 + msk.getSeconds();
+    document.getElementById('cnt-day').textContent = daySec.toLocaleString('ru-RU');
+    const start = new Date(msk.getFullYear(), 0, 1);
+    const daysYear = Math.floor((msk - start) / 86400000);
+    document.getElementById('cnt-year').textContent = daysYear.toLocaleString('ru-RU');
+    const end = new Date(msk.getFullYear(), 11, 31);
+    const daysLeft = Math.floor((end - msk) / 86400000) + 1;
+    document.getElementById('cnt-left').textContent = daysLeft;
+  }
+  counters();
+  setInterval(counters, 1000);
+
+  let saved = localStorage.getItem('theme') || 'dark';
+  if (!['dark','light'].includes(saved)) saved = 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  const btn = document.getElementById('themeBtn');
+  btn.textContent = saved === 'dark' ? '☀' : '🌙';
+  btn.addEventListener('click', function(){
+    const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+    const nxt = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', nxt);
+    localStorage.setItem('theme', nxt);
+    btn.textContent = nxt === 'dark' ? '☀' : '🌙';
+  });
+
+  let soundOn = localStorage.getItem('clockSound') === 'on';
+  const sBtn = document.getElementById('soundBtn');
+  sBtn.textContent = soundOn ? '🔊' : '🔇';
+  let audioCtx = null;
+  function beep(){
+    if (!audioCtx) {
+      try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+      catch(e){ return; }
+    }
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.frequency.value = 880;
+    osc.type = 'sine';
+    gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+    osc.connect(gain).connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.06);
+  }
+  sBtn.addEventListener('click', function(){
+    soundOn = !soundOn;
+    localStorage.setItem('clockSound', soundOn ? 'on' : 'off');
+    sBtn.textContent = soundOn ? '🔊' : '🔇';
+  });
+  setInterval(() => { if(soundOn) beep(); }, 1000);
+
+  const kind = 'storm';
+  const canvas = document.getElementById('bgCanvas');
+  if(canvas){
+    const ctx = canvas.getContext('2d');
+    let W, H, particles = [];
+    function resize(){
+      W = canvas.width = window.innerWidth * devicePixelRatio;
+      H = canvas.height = window.innerHeight * devicePixelRatio;
+      canvas.style.width = window.innerWidth + 'px';
+      canvas.style.height = window.innerHeight + 'px';
+    }
+    resize();
+    window.addEventListener('resize', resize);
+    let count = 0;
+    if(kind === 'rain' || kind === 'storm') count = 110;
+    else if(kind === 'snow') count = 80;
+    else if(kind === 'sun') count = 45;
+    else if(kind === 'fog') count = 30;
+    else count = 25;
+    for(let i = 0; i < count; i++){
+      particles.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: kind === 'rain' ? 0.5 : (Math.random() - 0.5) * 0.6,
+        vy: kind === 'rain' ? 4 + Math.random() * 6
+           : kind === 'snow' ? 0.4 + Math.random() * 1
+           : (Math.random() - 0.5) * 0.5,
+        r: kind === 'rain' ? 1 + Math.random() * 1.5
+          : kind === 'snow' ? 2 + Math.random() * 3
+          : 1 + Math.random() * 2.5,
+        a: 0.15 + Math.random() * 0.5,
+      });
+    }
+    function draw(){
+      ctx.clearRect(0, 0, W, H);
+      for(const p of particles){
+        if(kind === 'rain' || kind === 'storm'){
+          ctx.strokeStyle = 'rgba(150,200,255,' + p.a + ')';
+          ctx.lineWidth = p.r;
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(p.x + p.vx * 3, p.y + 20 + p.vy * 2);
+          ctx.stroke();
+        } else if(kind === 'snow'){
+          ctx.fillStyle = 'rgba(255,255,255,' + p.a + ')';
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+        } else if(kind === 'sun'){
+          ctx.fillStyle = 'rgba(255,220,120,' + (p.a * 0.8) + ')';
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          ctx.fillStyle = 'rgba(200,220,255,' + (p.a * 0.6) + ')';
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        p.x += p.vx;
+        p.y += p.vy;
+        if(p.y > H + 20){ p.y = -20; p.x = Math.random() * W; }
+        if(p.x > W + 20) p.x = -20;
+        if(p.x < -20) p.x = W + 20;
+      }
+      requestAnimationFrame(draw);
+    }
+    draw();
+  }
+})();
+
+</script>
+
+</body>
+</html>
