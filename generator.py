@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-generator.py — супер-дашборд: новости, погода, курсы, крипта, МКС,
-магнитные бури, качество воздуха, УФ, землетрясения, история, арт по погоде.
-Обновляется каждый час.
+generator.py — мега-дашборд: новости, погода, курсы, крипта, МКС,
+магнитные бури, качество воздуха, УФ, землетрясения, история,
+космос (Солнце, APOD, астероиды, ракеты), музей, кот, факт дня.
 """
 import os
 import re
@@ -76,6 +76,24 @@ MOOD_TRACKS = {
               ('Lightning Crashes', 'Live')],
     'fog': [('Fog', 'Radiohead'), ('Clint Eastwood', 'Gorillaz'), ('Silent Lucidity', 'Queensrÿche')],
 }
+
+FACTS = [
+    "Мёд не портится. Археологи находили в египетских гробницах 3000-летний мёд — он был съедобен.",
+    "Осьминоги имеют три сердца. Два качают кровь через жабры, третье — к остальному телу.",
+    "Бананы радиоактивны из-за калия-40. Но чтобы получить опасную дозу, нужно съесть ~10 миллионов.",
+    "Отпечаток языка — уникален, как отпечаток пальца. Нет двух людей с одинаковым.",
+    "Между Марсом и Юпитером больше миллиона астероидов, но их общая масса меньше массы Луны.",
+    "Средняя продолжительность молнии — 30 микросекунд. Но её видно — глаз цепляет кадр.",
+    "В человеческом теле 37 триллионов клеток и 30 триллионов бактерий — почти пополам.",
+    "Земля вращается со скоростью 1670 км/ч на экваторе — мы не замечаем.",
+    "Венера вращается в обратную сторону. Солнце там восходит на западе.",
+    "Твоё тело содержит ~7 000 000 000 000 000 000 000 000 000 атомов.",
+    "Вода в облаке размером с кубический километр весит ~500 тонн.",
+    "Первое фото Луны сделал Джон Адамс Уиппл в 1851 году.",
+    "Сердце за жизнь делает около 2,5 миллиардов ударов.",
+    "Стрекозы существовали до динозавров. Они старше на 100 млн лет.",
+    "Через 5 миллиардов лет Солнце станет красным гигантом и поглотит Меркурий и Венеру.",
+]
 
 
 def log(m): print(m, flush=True)
@@ -272,7 +290,6 @@ def fetch_news():
                     '%a, %d %b %Y %H:%M:%S'):
             try:
                 dt = datetime.datetime.strptime(s, fmt)
-                # Приводим к naive UTC чтобы сравнивать
                 if dt.tzinfo is not None:
                     dt = dt.astimezone(datetime.timezone.utc).replace(tzinfo=None)
                 return dt
@@ -307,28 +324,38 @@ def fetch_iss():
 
 # ============ МАГНИТНЫЕ БУРИ ============
 def fetch_kp_index():
-    r = get('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json',
-            json_=True, timeout=10)
-    if not r or not isinstance(r, list) or len(r) < 2:
-        return None
-    try:
-        last = r[-1]
-        kp = float(last[1])
-        kp_forecast = []
-        for row in r[-8:]:
-            try:
-                kp_forecast.append(float(row[1]))
-            except:
-                pass
-        return {
-            'kp': kp,
-            'level': kp_to_level(kp),
-            'aurora_possible': kp >= 6,
-            'forecast': kp_forecast,
-        }
-    except Exception as e:
-        log(f"Kp: {e}")
-        return None
+    candidates = [
+        'https://services.swpc.noaa.gov/json/planetary_k_index_1m.json',
+        'https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json',
+    ]
+    for url in candidates:
+        r = get(url, json_=True, timeout=10)
+        if not r or not isinstance(r, list) or len(r) < 2:
+            continue
+        vals = []
+        for item in r:
+            if isinstance(item, dict):
+                v = item.get('estimated_kp')
+                if v is None: v = item.get('kp_index')
+                if v is None: v = item.get('kp')
+                if v is not None:
+                    try: vals.append(float(v))
+                    except: pass
+            elif isinstance(item, list) and len(item) >= 2:
+                try:
+                    v = float(item[1])
+                    vals.append(v)
+                except: pass
+        if vals:
+            kp = vals[-1]
+            return {
+                'kp': kp,
+                'level': kp_to_level(kp),
+                'aurora_possible': kp >= 6,
+                'forecast': vals[-8:],
+            }
+    log("Kp: нет данных")
+    return None
 
 
 def kp_to_level(kp):
@@ -374,7 +401,7 @@ def aqi_level(aqi):
     return ('Опасный', '#dc2626')
 
 
-# ============ УФ-ИНДЕКС ============
+# ============ УФ ============
 def fetch_uv_index():
     r = get(f'https://api.open-meteo.com/v1/forecast'
             f'?latitude={NALCHIK_LAT}&longitude={NALCHIK_LON}'
@@ -513,7 +540,7 @@ def calendar_html(today):
             f'<div class="cal-grid">{heads}{"".join(cells)}</div>')
 
 
-# ============ АРТ ПО ПОГОДЕ ============
+# ============ АРТ ============
 def generate_svg_art(kind='cloud'):
     random.seed(datetime.datetime.now().strftime('%Y%m%d%H') + kind)
     hour = datetime.datetime.now().hour
@@ -558,7 +585,6 @@ def generate_svg_art(kind='cloud'):
         f'</svg>')
 
 
-# ============ АТМОСФЕРА ДНЯ ============
 def track_of_day(kind):
     today = datetime.date.today()
     tracks = MOOD_TRACKS.get(kind, MOOD_TRACKS['cloud'])
@@ -568,7 +594,124 @@ def track_of_day(kind):
     return {'name': name, 'artist': artist, 'url': f'https://www.youtube.com/results?search_query={q}'}
 
 
-# ============ РЕНДЕР ============
+# ============ КОСМОС / НОВЫЕ БЛОКИ ============
+def solar_image_url():
+    return {
+        'visible': 'https://sdo.gsfc.nasa.gov/assets/img/latest/latest_256_HMIIF.jpg',
+        'corona':  'https://sdo.gsfc.nasa.gov/assets/img/latest/latest_256_0171.jpg',
+        'atmo':    'https://sdo.gsfc.nasa.gov/assets/img/latest/latest_256_0304.jpg',
+    }
+
+
+def fetch_apod():
+    r = get('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY', json_=True, timeout=15)
+    if not r: return None
+    try:
+        return {
+            'url': r.get('hdurl') or r.get('url'),
+            'thumb': r.get('url'),
+            'title': r.get('title', ''),
+            'explanation': (r.get('explanation', '') or '')[:250] + '...',
+            'media_type': r.get('media_type', 'image'),
+            'date': r.get('date', ''),
+        }
+    except Exception as e:
+        log(f"APOD: {e}")
+        return None
+
+
+def fetch_asteroids():
+    today = datetime.date.today()
+    end = today + datetime.timedelta(days=7)
+    url = (f'https://api.nasa.gov/neo/rest/v1/feed'
+           f'?start_date={today}&end_date={end}&api_key=DEMO_KEY')
+    r = get(url, json_=True, timeout=15)
+    if not r: return []
+    try:
+        neos = r.get('near_earth_objects', {})
+        items = []
+        for date, list_ in neos.items():
+            for ast in list_:
+                d = ast.get('estimated_diameter', {}).get('meters', {})
+                size = round((d.get('estimated_diameter_min', 0) + d.get('estimated_diameter_max', 0)) / 2)
+                approach = ast.get('close_approach_data', [{}])[0]
+                items.append({
+                    'name': ast.get('name', '').replace('(', '').replace(')', ''),
+                    'size': size,
+                    'hazardous': ast.get('is_potentially_hazardous_asteroid', False),
+                    'date': approach.get('close_approach_date', ''),
+                    'velocity': round(float(approach.get('relative_velocity', {}).get('kilometers_per_hour', 0))),
+                    'distance': round(float(approach.get('miss_distance', {}).get('kilometers', 0))),
+                })
+        items.sort(key=lambda x: x['date'])
+        return items[:5]
+    except Exception as e:
+        log(f"Asteroids: {e}")
+        return []
+
+
+def fetch_rocket_launch():
+    r = get('https://ll.thespacedevs.com/2.2.0/launch/upcoming/?limit=1&mode=list',
+            json_=True, timeout=15)
+    if not r: return None
+    try:
+        results = r.get('results', [])
+        if not results: return None
+        item = results[0]
+        net = item.get('net', '')
+        try:
+            dt = datetime.datetime.fromisoformat(net.replace('Z', '+00:00'))
+            dt_naive = dt.astimezone(datetime.timezone.utc).replace(tzinfo=None)
+        except:
+            dt_naive = None
+        return {
+            'name': item.get('name', '?'),
+            'provider': (item.get('launch_service_provider') or {}).get('name', '?'),
+            'location': ((item.get('pad') or {}).get('location') or {}).get('name', '?'),
+            'net_str': net,
+            'dt': dt_naive,
+        }
+    except Exception as e:
+        log(f"Launch: {e}")
+        return None
+
+
+def fetch_art_of_day():
+    today = datetime.date.today()
+    base = 436535
+    idx = today.timetuple().tm_yday
+    for offset in range(20):
+        oid = base + ((idx * 97 + offset * 13) % 40000)
+        r = get(f'https://collectionapi.metmuseum.org/public/collection/v1/objects/{oid}',
+                json_=True, timeout=8)
+        if not r: continue
+        if r.get('primaryImageSmall') and r.get('isPublicDomain'):
+            return {
+                'url': r['primaryImageSmall'],
+                'title': r.get('title', '') or 'Без названия',
+                'artist': r.get('artistDisplayName', '') or 'Неизвестный',
+                'year': r.get('objectDate', ''),
+                'link': r.get('objectURL', ''),
+            }
+    return None
+
+
+def fetch_cat():
+    r = get('https://api.thecatapi.com/v1/images/search?size=med', json_=True, timeout=10)
+    if not r or not isinstance(r, list) or not r: return None
+    try:
+        return {'url': r[0]['url']}
+    except:
+        return None
+
+
+def fact_of_day():
+    today = datetime.date.today()
+    idx = (today.year * 366 + today.timetuple().tm_yday) % len(FACTS)
+    return FACTS[idx]
+
+
+# ============ РЕНДЕР БЛОКОВ ============
 def time_ago(dt):
     if dt == datetime.datetime.min: return ''
     try:
@@ -676,7 +819,7 @@ def render_kp(kp):
     if not kp: return '<div class="empty">—</div>'
     level_name, color = kp['level']
     bars = ''
-    for i, v in enumerate(kp['forecast'][-6:]):
+    for v in kp['forecast'][-6:]:
         h_pct = min(100, int((v / 9) * 100))
         bars += f'<div class="kp-bar" style="height:{h_pct}%" title="Kp={v}"></div>'
     return (
@@ -780,6 +923,110 @@ def render_track(track):
         f'</div></a>')
 
 
+def render_solar():
+    urls = solar_image_url()
+    return f'''
+    <div class="space-grid">
+      <a class="space-img" href="https://sdo.gsfc.nasa.gov/data/" target="_blank" rel="noopener">
+        <img src="{urls['visible']}" alt="Солнце видимое" loading="lazy" onerror="this.parentElement.style.display='none'">
+        <span class="space-label">Видимое</span>
+      </a>
+      <a class="space-img" href="https://sdo.gsfc.nasa.gov/data/" target="_blank" rel="noopener">
+        <img src="{urls['corona']}" alt="Корона" loading="lazy" onerror="this.parentElement.style.display='none'">
+        <span class="space-label">Корона 171Å</span>
+      </a>
+      <a class="space-img" href="https://sdo.gsfc.nasa.gov/data/" target="_blank" rel="noopener">
+        <img src="{urls['atmo']}" alt="Атмосфера" loading="lazy" onerror="this.parentElement.style.display='none'">
+        <span class="space-label">Атмосфера 304Å</span>
+      </a>
+    </div>
+    <div class="space-note">📸 NASA SDO · обновляется каждые 15 мин</div>
+    '''
+
+
+def render_apod(apod):
+    if not apod: return '<div class="empty">—</div>'
+    img = ''
+    if apod['media_type'] == 'image':
+        src = apod.get('thumb') or apod.get('url')
+        img = f'<img class="apod-img" src="{src}" alt="" loading="lazy" onerror="this.style.display=\'none\'">'
+    return f'''
+    <a class="apod-card" href="{apod['url']}" target="_blank" rel="noopener">
+      {img}
+      <div class="apod-info">
+        <div class="apod-title">{html.escape(apod['title'])}</div>
+        <div class="apod-date">{apod['date']}</div>
+        <div class="apod-desc">{html.escape(apod['explanation'])}</div>
+      </div>
+    </a>'''
+
+
+def render_asteroids(items):
+    if not items: return '<div class="empty">—</div>'
+    rows = []
+    for a in items[:4]:
+        icon = '⚠️' if a['hazardous'] else '☄️'
+        color = 'var(--bad)' if a['hazardous'] else 'var(--accent2)'
+        rows.append(
+            f'<div class="ast-row">'
+            f'<span class="ast-icon" style="color:{color}">{icon}</span>'
+            f'<div class="ast-info">'
+            f'<div class="ast-name">{html.escape(a["name"])}</div>'
+            f'<div class="ast-meta">{a["date"][5:]} · {a["size"]} м · {a["velocity"]:,} км/ч · {a["distance"]:,} км</div>'
+            f'</div></div>')
+    return ''.join(rows)
+
+
+def render_launch(launch):
+    if not launch: return '<div class="empty">—</div>'
+    if launch.get('dt'):
+        delta = launch['dt'] - datetime.datetime.utcnow()
+        s = int(delta.total_seconds())
+        if s > 0:
+            days = s // 86400
+            hours = (s % 86400) // 3600
+            mins = (s % 3600) // 60
+            if days > 0: countdown = f'{days}д {hours}ч {mins}м'
+            elif hours > 0: countdown = f'{hours}ч {mins}м'
+            else: countdown = f'{mins}м'
+        else:
+            countdown = 'уже летит 🚀'
+    else:
+        countdown = '—'
+    return (
+        f'<div class="launch-card">'
+        f'<div class="launch-icon">🚀</div>'
+        f'<div class="launch-info">'
+        f'<div class="launch-name">{html.escape(launch["name"])}</div>'
+        f'<div class="launch-provider">{html.escape(launch["provider"])}</div>'
+        f'<div class="launch-loc">{html.escape(launch["location"])}</div>'
+        f'<div class="launch-countdown">⏱ {countdown}</div>'
+        f'</div></div>')
+
+
+def render_art(art):
+    if not art: return '<div class="empty">—</div>'
+    return (
+        f'<a class="art-card-museum" href="{art["link"]}" target="_blank" rel="noopener">'
+        f'<img class="museum-img" src="{art["url"]}" alt="" loading="lazy" onerror="this.style.display=\'none\'">'
+        f'<div class="museum-info">'
+        f'<div class="museum-title">{html.escape(art["title"])}</div>'
+        f'<div class="museum-artist">{html.escape(art["artist"])}, {art["year"]}</div>'
+        f'<div class="museum-museum">🏛 The Met</div>'
+        f'</div></a>')
+
+
+def render_cat(cat):
+    if not cat: return '<div class="empty">—</div>'
+    return (f'<a class="cat-card" href="{cat["url"]}" target="_blank" rel="noopener">'
+            f'<img src="{cat["url"]}" alt="Кот" loading="lazy" onerror="this.parentElement.style.display=\'none\'">'
+            f'</a>')
+
+
+def render_fact():
+    return f'<div class="fact-text">{html.escape(fact_of_day())}</div>'
+
+
 # ============ ГЛАВНАЯ ============
 def generate():
     log("📄 Генерирую dashboard...")
@@ -810,11 +1057,26 @@ def generate():
     days_ny = days_to_new_year()
     track = track_of_day(kind)
 
+    # Новые блоки
+    apod = fetch_apod()
+    asteroids = fetch_asteroids()
+    launch = fetch_rocket_launch()
+    art = fetch_art_of_day()
+    cat = fetch_cat()
+
     aurora_class = ' aurora' if kp and kp['aurora_possible'] else ''
 
     news_block = render_news()
     calendar_block = calendar_html(today)
     svg_art = generate_svg_art(kind)
+
+    apod_block = render_apod(apod)
+    asteroids_block = render_asteroids(asteroids)
+    launch_block = render_launch(launch)
+    art_block = render_art(art)
+    cat_block = render_cat(cat)
+    fact_block = render_fact()
+    solar_block = render_solar()
 
     html_out = f'''<!DOCTYPE html>
 <html lang="ru">
@@ -951,6 +1213,62 @@ def generate():
     <div class="quote-author">{author}</div>
   </div>
 
+  <div class="card card-solar">
+    <h3>🌞 Солнце прямо сейчас</h3>
+    {solar_block}
+  </div>
+
+  <div class="card card-apod">
+    <h3>🌌 Фото дня · NASA</h3>
+    {apod_block}
+  </div>
+
+  <div class="card card-asteroids">
+    <h3>☄️ Астероиды недели</h3>
+    {asteroids_block}
+  </div>
+
+  <div class="card card-launch">
+    <h3>🚀 Ближайший запуск</h3>
+    {launch_block}
+  </div>
+
+  <div class="card card-museum">
+    <h3>🎨 Картина дня</h3>
+    {art_block}
+  </div>
+
+  <div class="card card-cat">
+    <h3>🐱 Кот дня</h3>
+    {cat_block}
+  </div>
+
+  <div class="card card-sleep">
+    <h3>💤 Фаза сна</h3>
+    <div class="sleep-block">
+      <div class="sleep-row"><span>Встать в</span> <b>06:00</b> → лечь в <b id="sleep-6">--:--</b></div>
+      <div class="sleep-row"><span>Встать в</span> <b>07:00</b> → лечь в <b id="sleep-7">--:--</b></div>
+      <div class="sleep-row"><span>Встать в</span> <b>08:00</b> → лечь в <b id="sleep-8">--:--</b></div>
+      <div class="sleep-note">💡 90-минутные циклы сна</div>
+    </div>
+  </div>
+
+  <div class="card card-dice">
+    <h3>🎲 Кубик / Монетка</h3>
+    <div class="dice-wrap">
+      <div class="dice-result" id="diceResult">🎲</div>
+      <div class="dice-buttons">
+        <button class="dice-btn" onclick="rollDice()">Кубик</button>
+        <button class="dice-btn" onclick="flipCoin()">Монетка</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-fact">
+    <h3>🧠 Факт дня</h3>
+    {fact_block}
+  </div>
+
 </div>
 
 <div class="footer">
@@ -1047,10 +1365,22 @@ body.aurora::after{
 .card-history{grid-column:span 6}
 .card-quote{grid-column:span 12}
 
+.card-solar{grid-column:span 6}
+.card-apod{grid-column:span 6}
+.card-asteroids{grid-column:span 4}
+.card-launch{grid-column:span 4}
+.card-museum{grid-column:span 4}
+.card-cat{grid-column:span 3;padding:0;overflow:hidden}
+.card-sleep{grid-column:span 3}
+.card-dice{grid-column:span 3;text-align:center}
+.card-fact{grid-column:span 3}
+
 @media(max-width:1000px){
   .card-clock,.card-weather,.card-iss,.card-kp,.card-aq,.card-uv{grid-column:span 6}
   .card-currency,.card-crypto,.card-calendar,.card-art,.card-gh,.card-moon,.card-ny,.card-track{grid-column:span 3}
   .card-news,.card-eq,.card-history,.card-quote{grid-column:span 6}
+  .card-solar,.card-apod,.card-asteroids,.card-launch,.card-museum{grid-column:span 6}
+  .card-cat,.card-sleep,.card-dice,.card-fact{grid-column:span 3}
 }
 
 .clock{font-size:clamp(56px,10vw,88px);font-weight:200;letter-spacing:-0.05em;line-height:0.95;font-variant-numeric:tabular-nums;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
@@ -1172,6 +1502,61 @@ body.aurora::after{
 
 .holiday{grid-column:span 12;text-align:center;padding:12px 20px;background:linear-gradient(135deg,rgba(255,193,7,0.15),rgba(255,87,34,0.12));border:1px solid rgba(255,193,7,0.3);border-radius:16px;font-size:15px;font-weight:500;animation:holidayPulse 3s ease-in-out infinite}
 @keyframes holidayPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,193,7,0.3)}50%{box-shadow:0 0 30px 4px rgba(255,193,7,0.18)}}
+
+/* ===== Новые блоки ===== */
+.space-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.space-img{position:relative;border-radius:10px;overflow:hidden;text-decoration:none;display:block;background:#000}
+.space-img img{width:100%;height:auto;display:block;transition:transform .3s}
+.space-img:hover img{transform:scale(1.05)}
+.space-label{position:absolute;bottom:4px;left:6px;font-size:9px;color:#fff;background:rgba(0,0,0,0.6);padding:2px 6px;border-radius:6px;font-weight:500}
+.space-note{text-align:center;font-size:10px;color:var(--muted)}
+
+.apod-card{display:block;text-decoration:none;color:var(--text)}
+.apod-img{width:100%;height:200px;object-fit:cover;border-radius:12px;margin-bottom:10px;background:var(--panel2)}
+.apod-title{font-size:14px;font-weight:500;margin-bottom:4px;line-height:1.3}
+.apod-card:hover .apod-title{color:var(--accent)}
+.apod-date{font-size:10px;color:var(--muted);margin-bottom:6px;letter-spacing:0.4px}
+.apod-desc{font-size:11px;color:var(--muted);line-height:1.45;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
+
+.ast-row{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.ast-row:last-child{border-bottom:none}
+.ast-icon{font-size:20px;line-height:1}
+.ast-info{flex:1;min-width:0}
+.ast-name{font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ast-meta{font-size:10px;color:var(--muted);margin-top:2px}
+
+.launch-card{display:flex;gap:12px;align-items:flex-start}
+.launch-icon{font-size:36px;line-height:1;filter:drop-shadow(0 4px 12px rgba(96,165,250,0.4))}
+.launch-info{flex:1;min-width:0}
+.launch-name{font-size:13px;font-weight:500;line-height:1.3;margin-bottom:4px}
+.launch-provider{font-size:11px;color:var(--accent);margin-bottom:2px}
+.launch-loc{font-size:10px;color:var(--muted);margin-bottom:6px}
+.launch-countdown{font-size:14px;font-weight:600;color:var(--accent2);font-variant-numeric:tabular-nums}
+
+.art-card-museum{display:block;text-decoration:none;color:var(--text)}
+.museum-img{width:100%;height:200px;object-fit:cover;border-radius:12px;margin-bottom:10px;background:var(--panel2)}
+.museum-title{font-size:13px;font-weight:500;margin-bottom:2px}
+.art-card-museum:hover .museum-title{color:var(--accent)}
+.museum-artist{font-size:11px;color:var(--muted)}
+.museum-museum{font-size:10px;color:var(--muted);margin-top:6px;opacity:0.7}
+
+.cat-card{display:block}
+.cat-card img{width:100%;height:100%;min-height:180px;object-fit:cover;display:block}
+
+.sleep-block{font-size:12px}
+.sleep-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);color:var(--muted);flex-wrap:wrap;gap:4px}
+.sleep-row:last-of-type{border-bottom:none}
+.sleep-row b{color:var(--text);font-variant-numeric:tabular-nums;font-weight:500}
+.sleep-note{font-size:10px;color:var(--muted);margin-top:10px;text-align:center;opacity:0.7}
+
+.dice-result{font-size:60px;line-height:1;margin:10px 0;min-height:70px;display:flex;align-items:center;justify-content:center;transition:transform .3s}
+.dice-result.rolling{animation:shake .5s}
+@keyframes shake{0%,100%{transform:rotate(0)}25%{transform:rotate(-15deg)}75%{transform:rotate(15deg)}}
+.dice-buttons{display:flex;gap:8px;justify-content:center;margin-top:10px}
+.dice-btn{background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:8px 14px;border-radius:10px;cursor:pointer;font-size:12px;font-family:inherit;transition:border-color .15s}
+.dice-btn:hover{border-color:var(--accent)}
+
+.fact-text{font-size:13px;line-height:1.5;color:var(--text);font-style:italic}
 
 .footer{text-align:center;font-size:11px;color:var(--muted);padding:24px 0 8px}
 
@@ -1321,6 +1706,57 @@ def get_js(weather_kind):
     }}
     draw();
   }}
+
+  // ===== Фаза сна =====
+  function sleepCalc(){{
+    const now = new Date();
+    const msk = new Date(now.toLocaleString('en-US', {{timeZone:'Europe/Moscow'}}));
+    [6, 7, 8].forEach(target => {{
+      const wake = new Date(msk);
+      wake.setHours(target, 0, 0, 0);
+      if (wake <= msk) wake.setDate(wake.getDate() + 1);
+      const cycles = 5;
+      const sleepMs = wake.getTime() - (15 * 60 * 1000) - (cycles * 90 * 60 * 1000);
+      const s = new Date(sleepMs);
+      const hh = String(s.getHours()).padStart(2, '0');
+      const mm = String(s.getMinutes()).padStart(2, '0');
+      const el = document.getElementById('sleep-' + target);
+      if (el) el.textContent = hh + ':' + mm;
+    }});
+  }}
+  sleepCalc();
+  setInterval(sleepCalc, 60000);
+
+  // ===== Кубик / Монетка =====
+  window.rollDice = function(){{
+    const el = document.getElementById('diceResult');
+    if (!el) return;
+    el.classList.add('rolling');
+    const faces = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+    let n = 0;
+    const iv = setInterval(() => {{
+      el.textContent = faces[Math.floor(Math.random() * 6)];
+      n++;
+      if (n > 10) {{
+        clearInterval(iv);
+        el.classList.remove('rolling');
+      }}
+    }}, 60);
+  }};
+  window.flipCoin = function(){{
+    const el = document.getElementById('diceResult');
+    if (!el) return;
+    el.classList.add('rolling');
+    let n = 0;
+    const iv = setInterval(() => {{
+      el.textContent = Math.random() < 0.5 ? '🪙 Орёл' : '🪙 Решка';
+      n++;
+      if (n > 8) {{
+        clearInterval(iv);
+        el.classList.remove('rolling');
+      }}
+    }}, 80);
+  }};
 }})();
 '''
 
