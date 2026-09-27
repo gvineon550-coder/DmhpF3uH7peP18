@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-generator.py — MEGA dashboard v3.
-Погода, космос, новости, инструменты, трекеры, самолёты, живая карта МКС.
+generator.py — MEGA dashboard v4.
+Погода, космос, новости, инструменты, трекеры, самолёты, живая карта МКС,
+инфо-блок, бэкап/восстановление, мини-радио, трекер сна.
 """
 import os
 import re
@@ -17,7 +18,7 @@ from math import radians, cos, sin, asin, sqrt
 import requests
 
 DOCS = Path('docs')
-UA = 'Mozilla/5.0 (compatible; Dashboard/3.0)'
+UA = 'Mozilla/5.0 (compatible; Dashboard/4.0)'
 NALCHIK_LAT = 43.4981
 NALCHIK_LON = 43.6189
 NALCHIK_NAME = 'Нальчик'
@@ -744,7 +745,7 @@ def render_article(article):
 
 
 def generate():
-    log("📄 Генерирую dashboard v3...")
+    log("📄 Генерирую dashboard v4...")
     DOCS.mkdir(exist_ok=True)
 
     now = datetime.datetime.now(); today = now.date()
@@ -829,6 +830,52 @@ def generate():
     </div>
   </div>
 
+  <div class="card card-about">
+    <h3>📖 О сайте · как пользоваться</h3>
+    <details>
+      <summary>Что это такое?</summary>
+      <p>Личный дашборд-помощник. Живёт на GitHub Pages, обновляется автоматически каждый час. Показывает погоду, новости, космос, курсы — и хранит твои заметки, привычки, задачи.</p>
+    </details>
+    <details>
+      <summary>Как пользоваться?</summary>
+      <ul>
+        <li>🎯 <b>Привычки</b> — добавляй и отмечай каждый день</li>
+        <li>✅ <b>Задачи</b> — пиши что надо сделать</li>
+        <li>📝 <b>Заметки</b> — сохраняются сами</li>
+        <li>🍅 <b>Помодоро</b> — 25 мин работа, 5 отдых</li>
+        <li>💧 <b>Вода</b> — отмечай выпитые стаканы</li>
+        <li>😊 <b>Настроение</b> — 1 клик в день</li>
+        <li>💤 <b>Мой сон</b> — вводи лёг/встал, смотри график</li>
+        <li>⏳ <b>Счётчики дат</b> — «до отпуска N дней»</li>
+        <li>💾 <b>Бэкап</b> — сохрани все данные в JSON</li>
+      </ul>
+    </details>
+    <details>
+      <summary>🔒 Приватность — что важно знать</summary>
+      <p><b>Все твои данные хранятся только в браузере</b> (localStorage). Никто — ни автор сайта, ни GitHub — не видит твои заметки, привычки, задачи.</p>
+      <p><b>Важно:</b> если очистишь кэш Chrome — данные пропадут. Сделай бэкап!</p>
+      <p>Все публичные данные (погода, курсы, новости) берутся из открытых API. Ничего личного не уходит.</p>
+    </details>
+    <details>
+      <summary>🌐 Источники данных</summary>
+      <ul>
+        <li>🌤 Погода — wttr.in</li>
+        <li>💱 Курсы — ЦБ РФ</li>
+        <li>💰 Крипта — CoinGecko</li>
+        <li>📰 Новости — Lenta, RBC, TASS, Habr, Известия</li>
+        <li>🛰 МКС — WhereTheISS</li>
+        <li>🌌 Магнитное поле — NOAA</li>
+        <li>🌬 Воздух, УФ — Open-Meteo</li>
+        <li>🌍 Землетрясения — USGS</li>
+        <li>🚀 Ракеты — TheSpaceDevs</li>
+        <li>🌞 Солнце — NASA SDO</li>
+        <li>🎨 Картина — The Met Museum</li>
+        <li>🐱 Кот — TheCatAPI</li>
+        <li>📖 История — Wikipedia</li>
+      </ul>
+    </details>
+  </div>
+
   <div class="card card-weather"><h3>🌤 Погода · {NALCHIK_NAME}</h3>{render_weather(weather)}</div>
   <div class="card card-iss"><h3>🛰 МКС</h3>{render_iss(iss)}</div>
   <div class="card card-kp"><h3>🌌 Магнитное поле</h3>{render_kp(kp)}</div>
@@ -856,6 +903,42 @@ def generate():
 
   <div class="card card-planes"><h3>✈️ Самолёты над Нальчиком</h3>{render_planes(planes)}</div>
   <div class="card card-article"><h3>📖 Статья дня</h3>{render_article(article)}</div>
+
+  <div class="card card-radio">
+    <h3>📻 Радио онлайн</h3>
+    <div class="radio-list">
+      <button class="radio-btn" onclick="playRadio('https://radio-record.hostingradio.ru/record128.mp3','Radio Record')">🎵 Radio Record</button>
+      <button class="radio-btn" onclick="playRadio('https://ep128.hostingradio.ru:8030/ep128','Европа Плюс')">🎵 Европа Плюс</button>
+      <button class="radio-btn" onclick="playRadio('https://retroserver.streamr.ru:8043/retro256.mp3','Ретро FM')">🎵 Ретро FM</button>
+      <button class="radio-btn" onclick="playRadio('https://dfm.hostingradio.ru/dfm96.aacp','DFM')">🎵 DFM</button>
+      <button class="radio-btn" onclick="playRadio('https://nashe1.hostingradio.ru/nashe-128.mp3','Наше Радио')">🎵 Наше Радио</button>
+    </div>
+    <div class="radio-player" id="radioPlayer" style="display:none">
+      <div class="radio-now" id="radioNow">—</div>
+      <audio id="radioAudio" controls style="width:100%;margin-top:8px"></audio>
+      <button class="dice-btn" style="width:100%;margin-top:6px" onclick="stopRadio()">⏹ Выключить</button>
+    </div>
+  </div>
+
+  <div class="card card-sleeptrack">
+    <h3>💤 Мой сон</h3>
+    <div class="sleeptrack-inputs">
+      <div class="sleeptrack-row"><label>Лёг в</label><input type="time" id="sleepIn" value="23:00" onchange="saveSleep()"></div>
+      <div class="sleeptrack-row"><label>Встал в</label><input type="time" id="sleepOut" value="07:00" onchange="saveSleep()"></div>
+    </div>
+    <div class="sleeptrack-result" id="sleepResult">—</div>
+    <div class="sleeptrack-week" id="sleepWeek"></div>
+  </div>
+
+  <div class="card card-backup">
+    <h3>💾 Бэкап данных</h3>
+    <p class="backup-note">Скачай все свои данные (привычки, задачи, заметки, даты) в один файл. Восстановишь позже или перенесёшь на другое устройство.</p>
+    <button class="dice-btn" style="width:100%;margin-bottom:8px" onclick="backupData()">📥 Скачать JSON</button>
+    <button class="dice-btn" style="width:100%;margin-bottom:8px" onclick="document.getElementById('restoreInput').click()">📤 Восстановить из файла</button>
+    <input type="file" id="restoreInput" accept=".json" style="display:none" onchange="restoreData(event)">
+    <button class="dice-btn" style="width:100%;color:var(--bad)" onclick="clearAllData()">🗑 Очистить всё</button>
+    <div class="backup-status" id="backupStatus"></div>
+  </div>
 
   <div class="card card-habits">
     <h3>🎯 Мои привычки</h3>
@@ -963,7 +1046,7 @@ def generate():
   </div>
 
   <div class="card card-sleep">
-    <h3>💤 Фаза сна</h3>
+    <h3>💤 Фаза сна (рекомендации)</h3>
     <div class="sleep-block">
       <div class="sleep-row"><span>Встать в</span> <b>06:00</b> → лечь в <b id="sleep-6">--:--</b></div>
       <div class="sleep-row"><span>Встать в</span> <b>07:00</b> → лечь в <b id="sleep-7">--:--</b></div>
@@ -1041,6 +1124,16 @@ body.aurora::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:n
 @keyframes fadeInUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 .empty{color:var(--muted);font-size:13px;text-align:center;padding:12px}
 .card-clock{grid-column:span 4;min-height:220px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:30px 24px}
+.card-about{grid-column:span 12}
+.card-about details{padding:10px 0;border-bottom:1px solid var(--border)}
+.card-about details:last-child{border-bottom:none}
+.card-about summary{cursor:pointer;font-size:14px;font-weight:500;padding:6px 0;color:var(--text);transition:color .15s}
+.card-about summary:hover{color:var(--accent)}
+.card-about summary::marker{color:var(--accent)}
+.card-about p,.card-about ul{font-size:13px;color:var(--muted);line-height:1.6;padding:8px 0 8px 8px;margin:0}
+.card-about ul{list-style:none;padding-left:0}
+.card-about ul li{padding:3px 0}
+.card-about p b,.card-about ul b{color:var(--text)}
 .card-weather{grid-column:span 4}.card-iss{grid-column:span 4}.card-kp{grid-column:span 4}.card-aq{grid-column:span 4}.card-uv{grid-column:span 4}
 .card-currency{grid-column:span 3}.card-crypto{grid-column:span 3}
 .card-news{grid-column:span 6;grid-row:span 2}
@@ -1052,13 +1145,16 @@ body.aurora::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:n
 .card-planes{grid-column:span 6}.card-article{grid-column:span 6}
 .card-habits{grid-column:span 4}.card-todo{grid-column:span 4}.card-notes{grid-column:span 4}
 .card-pomo{grid-column:span 3;text-align:center}.card-mood{grid-column:span 3;text-align:center}.card-water{grid-column:span 3;text-align:center}.card-conv{grid-column:span 3}
-.card-tools{grid-column:span 4}.card-dates{grid-column:span 4}.card-issmap{grid-column:span 4}
+.card-tools{grid-column:span 3}.card-dates{grid-column:span 3}.card-issmap{grid-column:span 3}
+.card-radio{grid-column:span 3}
+.card-sleeptrack{grid-column:span 3}
+.card-backup{grid-column:span 3}
 @media(max-width:1000px){
   .card-clock,.card-weather,.card-iss,.card-kp,.card-aq,.card-uv{grid-column:span 6}
   .card-currency,.card-crypto,.card-calendar,.card-art,.card-gh,.card-moon,.card-ny,.card-track{grid-column:span 3}
-  .card-news,.card-eq,.card-history,.card-quote{grid-column:span 6}
+  .card-news,.card-eq,.card-history,.card-quote,.card-about{grid-column:span 6}
   .card-solar,.card-apod,.card-asteroids,.card-launch,.card-museum,.card-planes,.card-article{grid-column:span 6}
-  .card-cat,.card-sleep,.card-dice,.card-fact{grid-column:span 3}
+  .card-cat,.card-sleep,.card-dice,.card-fact,.card-radio,.card-sleeptrack,.card-backup{grid-column:span 3}
   .card-habits,.card-todo,.card-notes,.card-tools,.card-dates,.card-issmap{grid-column:span 6}
   .card-pomo,.card-mood,.card-water,.card-conv{grid-column:span 3}
 }
@@ -1178,13 +1274,22 @@ body.aurora::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:n
 .article-title{font-size:15px;font-weight:600;margin-bottom:8px;line-height:1.3}.article-card:hover .article-title{color:var(--accent)}
 .article-desc{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:8px}
 .article-source{font-size:10px;color:var(--muted);opacity:0.7}
-
-/* ISS map */
 .issmap-wrap{width:100%;border-radius:12px;overflow:hidden;background:#0a1628;margin-bottom:10px}
 .issmap{width:100%;height:auto;display:block;aspect-ratio:2/1}
 .issmap-info{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-family:ui-monospace,monospace}
-
-/* Tools */
+.radio-list{display:flex;flex-direction:column;gap:6px}
+.radio-btn{background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:10px;cursor:pointer;font-size:13px;text-align:left;transition:border-color .15s;font-family:inherit}
+.radio-btn:hover{border-color:var(--accent);background:rgba(96,165,250,0.08)}
+.radio-now{font-size:12px;color:var(--accent);text-align:center;margin-bottom:6px;font-weight:500}
+.sleeptrack-inputs{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.sleeptrack-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted)}
+.sleeptrack-row input{background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:8px;font-family:inherit;font-size:13px}
+.sleeptrack-row input:focus{outline:none;border-color:var(--accent)}
+.sleeptrack-result{font-size:22px;font-weight:300;color:var(--accent);text-align:center;padding:8px 0;font-variant-numeric:tabular-nums}
+.sleeptrack-week{display:flex;gap:4px;justify-content:space-between;align-items:flex-end;height:40px;padding-top:10px;border-top:1px solid var(--border)}
+.sleeptrack-bar{flex:1;background:linear-gradient(180deg,var(--accent),var(--accent2));border-radius:4px 4px 0 0;min-height:4px;position:relative;transition:height .3s}
+.backup-note{font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:12px}
+.backup-status{font-size:11px;color:var(--good);text-align:center;margin-top:8px;min-height:14px}
 .tool-input-row{display:flex;gap:6px;margin-top:10px}
 .tool-input-row input{flex:1;background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:10px;font-size:13px;font-family:inherit}
 .tool-input-row input:focus{outline:none;border-color:var(--accent)}
@@ -1375,8 +1480,6 @@ def get_js(weather_kind):
     let n = 0;
     const iv = setInterval(() => {{ el.textContent = Math.random() < 0.5 ? '🪙 Орёл' : '🪙 Решка'; n++; if (n > 8) {{ clearInterval(iv); el.classList.remove('rolling'); }} }}, 80);
   }};
-
-  // ============ КАРТА МКС (LIVE) ============
   let issLat = 0, issLon = 0;
   function updateIssMap(){{
     const dot = document.getElementById('issDot');
@@ -1386,10 +1489,7 @@ def get_js(weather_kind):
     const y = 90 - issLat;
     dot.setAttribute('cx', x);
     dot.setAttribute('cy', y);
-    if (dot2) {{
-      dot2.setAttribute('cx', x);
-      dot2.setAttribute('cy', y);
-    }}
+    if (dot2) {{ dot2.setAttribute('cx', x); dot2.setAttribute('cy', y); }}
     const coordsEl = document.getElementById('issMapCoords');
     if (coordsEl) coordsEl.textContent = issLat.toFixed(1) + '°, ' + issLon.toFixed(1) + '°';
     const lat1 = 43.4981, lon1 = 43.6189;
@@ -1406,13 +1506,152 @@ def get_js(weather_kind):
       const r = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
       if (!r.ok) return;
       const d = await r.json();
-      issLat = d.latitude;
-      issLon = d.longitude;
+      issLat = d.latitude; issLon = d.longitude;
       updateIssMap();
     }} catch(e){{}}
   }}
   fetchIssLive();
   setInterval(fetchIssLive, 5000);
+
+  // ============ МИНИ-РАДИО ============
+  window.playRadio = function(url, name){{
+    const audio = document.getElementById('radioAudio');
+    const player = document.getElementById('radioPlayer');
+    const now = document.getElementById('radioNow');
+    if (!audio) return;
+    audio.src = url;
+    audio.play().catch(e => alert('Не удалось включить: ' + e.message));
+    if (player) player.style.display = 'block';
+    if (now) now.textContent = '🎵 ' + name;
+  }};
+  window.stopRadio = function(){{
+    const audio = document.getElementById('radioAudio');
+    const player = document.getElementById('radioPlayer');
+    if (audio){{ audio.pause(); audio.src = ''; }}
+    if (player) player.style.display = 'none';
+  }};
+
+  // ============ ТРЕКЕР СНА ============
+  function loadSleep(){{
+    try {{ return JSON.parse(localStorage.getItem('sleep') || '{{}}'); }} catch(e){{ return {{}}; }}
+  }}
+  function saveSleepData(d){{ localStorage.setItem('sleep', JSON.stringify(d)); }}
+  window.saveSleep = function(){{
+    const inEl = document.getElementById('sleepIn');
+    const outEl = document.getElementById('sleepOut');
+    if (!inEl || !outEl) return;
+    const d = loadSleep();
+    const today = new Date();
+    const key = today.getFullYear() + '-' + (today.getMonth()+1) + '-' + today.getDate();
+    d[key] = {{ in: inEl.value, out: outEl.value }};
+    saveSleepData(d);
+    renderSleep();
+  }};
+  function calcHours(inT, outT){{
+    if (!inT || !outT) return 0;
+    const [ih, im] = inT.split(':').map(Number);
+    const [oh, om] = outT.split(':').map(Number);
+    let mins = (oh * 60 + om) - (ih * 60 + im);
+    if (mins < 0) mins += 24 * 60;
+    return mins / 60;
+  }}
+  function renderSleep(){{
+    const d = loadSleep();
+    const today = new Date();
+    const key = today.getFullYear() + '-' + (today.getMonth()+1) + '-' + today.getDate();
+    const inEl = document.getElementById('sleepIn');
+    const outEl = document.getElementById('sleepOut');
+    if (d[key]){{
+      if (inEl) inEl.value = d[key].in;
+      if (outEl) outEl.value = d[key].out;
+    }}
+    const hrs = calcHours(inEl ? inEl.value : '23:00', outEl ? outEl.value : '07:00');
+    const resEl = document.getElementById('sleepResult');
+    if (resEl){{
+      const h = Math.floor(hrs);
+      const m = Math.round((hrs - h) * 60);
+      const color = hrs >= 7 ? 'var(--good)' : (hrs >= 6 ? 'var(--warn)' : 'var(--bad)');
+      resEl.innerHTML = '<span style="color:' + color + '">' + h + 'ч ' + m + 'м</span>';
+    }}
+    const weekEl = document.getElementById('sleepWeek');
+    if (weekEl){{
+      const days = [];
+      for (let i = 6; i >= 0; i--){{
+        const dt = new Date(); dt.setDate(dt.getDate() - i);
+        const k = dt.getFullYear() + '-' + (dt.getMonth()+1) + '-' + dt.getDate();
+        const entry = d[k];
+        const h = entry ? calcHours(entry.in, entry.out) : 0;
+        days.push({{ key: k, hours: h }});
+      }}
+      const maxH = 10;
+      const bars = days.map(x => {{
+        const pct = Math.min(100, (x.hours / maxH) * 100);
+        const title = x.hours > 0 ? x.hours.toFixed(1) + 'ч' : '—';
+        return '<div class="sleeptrack-bar" style="height:' + pct + '%" title="' + title + '"></div>';
+      }}).join('');
+      weekEl.innerHTML = bars;
+    }}
+  }}
+  renderSleep();
+
+  // ============ БЭКАП / ВОССТАНОВЛЕНИЕ ============
+  const BACKUP_KEYS = ['habits', 'todo', 'notes', 'dates', 'theme', 'clockSound', 'sleep'];
+  window.backupData = function(){{
+    const data = {{ version: 4, exported: new Date().toISOString(), data: {{}} }};
+    BACKUP_KEYS.forEach(k => {{
+      const v = localStorage.getItem(k);
+      if (v !== null) data.data[k] = v;
+    }});
+    for (let i = 0; i < localStorage.length; i++){{
+      const k = localStorage.key(i);
+      if (k && (k.startsWith('mood-') || k.startsWith('water-') || k.startsWith('pomo-'))){
+        data.data[k] = localStorage.getItem(k);
+      }}
+    }}
+    const blob = new Blob([JSON.stringify(data, null, 2)], {{type: 'application/json'}});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'dashboard-backup-' + new Date().toISOString().slice(0,10) + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    const st = document.getElementById('backupStatus');
+    if (st){{ st.textContent = '✓ Скачано'; setTimeout(() => st.textContent = '', 3000); }}
+  }};
+  window.restoreData = function(ev){{
+    const file = ev.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {{
+      try {{
+        const parsed = JSON.parse(e.target.result);
+        if (!parsed.data) {{ throw new Error('Неверный формат'); }}
+        let restored = 0;
+        Object.entries(parsed.data).forEach(([k, v]) => {{
+          localStorage.setItem(k, v);
+          restored++;
+        }});
+        const st = document.getElementById('backupStatus');
+        if (st){{ st.textContent = '✓ Восстановлено: ' + restored + ' ключей. Обнови страницу.'; setTimeout(() => location.reload(), 1500); }}
+      }} catch (err) {{
+        const st = document.getElementById('backupStatus');
+        if (st){{ st.textContent = '❌ Ошибка: ' + err.message; }}
+      }}
+    }};
+    reader.readAsText(file);
+    ev.target.value = '';
+  }};
+  window.clearAllData = function(){{
+    if (!confirm('Точно удалить ВСЕ данные? Это необратимо!')) return;
+    const toDelete = [];
+    for (let i = 0; i < localStorage.length; i++){{
+      const k = localStorage.key(i);
+      if (k && (k.startsWith('mood-') || k.startsWith('water-') || k.startsWith('pomo-'))) toDelete.push(k);
+    }}
+    BACKUP_KEYS.forEach(k => {{ if (localStorage.getItem(k) !== null) toDelete.push(k); }});
+    toDelete.forEach(k => localStorage.removeItem(k));
+    location.reload();
+  }};
 
   // ============ ПРИВЫЧКИ ============
   function todayKey() {{ const d = new Date(); return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate(); }}
