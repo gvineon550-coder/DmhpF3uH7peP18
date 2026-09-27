@@ -63,7 +63,6 @@ QUOTES = [
     ("Успех — это способность идти от неудачи к неудаче, не теряя энтузиазма.", "Уинстон Черчилль"),
 ]
 
-# Атмосфера дня — треки по погоде/настроению
 MOOD_TRACKS = {
     'sun': [('Here Comes the Sun', 'The Beatles'), ('Walking on Sunshine', 'Katrina & The Waves'),
             ('Good Vibrations', 'The Beach Boys')],
@@ -160,15 +159,12 @@ def fetch_weather():
 
 # ============ ЗОЛОТОЙ ЧАС ============
 def golden_hour(weather):
-    """Утро: за 1ч до восхода и до +1ч. Вечер: за 1ч до заката и до +1ч."""
     if not weather or not weather.get('sunrise') or not weather.get('sunset'):
         return None
     def parse_t(s):
         try:
-            h, m = s.split(':')[:2]
-            h = int(h)
-            # wttr.in отдаёт AM/PM? Нет, отдаёт 24ч
-            return h, int(m)
+            parts = s.split(':')
+            return int(parts[0]), int(parts[1])
         except Exception:
             return None, None
     sr_h, sr_m = parse_t(weather['sunrise'])
@@ -259,7 +255,7 @@ NEWS_SOURCES = [
     ('RBC', 'https://rssexport.rbc.ru/rbcnews/news/30/full.rss'),
     ('TASS', 'https://tass.ru/rss/v2.xml'),
     ('Habr', 'https://habr.com/ru/rss/news/?fl=ru'),
-    ('РБК Тех', 'https://rssexport.rbc.ru/rbcnews/tech/20/full.rss'),
+    ('Газета', 'https://www.gazeta.ru/export/rss/lenta.xml'),
 ]
 
 
@@ -269,12 +265,23 @@ def fetch_news():
         r = get(url, timeout=12)
         if not r: continue
         all_items.extend(parse_rss(r.content, name, limit=5))
+
     def parse_date(s):
-        for fmt in ('%a, %d %b %Y %H:%M:%S %z', '%a, %d %b %Y %H:%M:%S %Z'):
-            try: return datetime.datetime.strptime(s, fmt)
-            except: continue
+        for fmt in ('%a, %d %b %Y %H:%M:%S %z',
+                    '%a, %d %b %Y %H:%M:%S %Z',
+                    '%a, %d %b %Y %H:%M:%S'):
+            try:
+                dt = datetime.datetime.strptime(s, fmt)
+                # Приводим к naive UTC чтобы сравнивать
+                if dt.tzinfo is not None:
+                    dt = dt.astimezone(datetime.timezone.utc).replace(tzinfo=None)
+                return dt
+            except:
+                continue
         return datetime.datetime.min
-    for it in all_items: it['dt'] = parse_date(it['date'])
+
+    for it in all_items:
+        it['dt'] = parse_date(it['date'])
     all_items.sort(key=lambda x: x['dt'], reverse=True)
     return all_items[:12]
 
@@ -305,15 +312,14 @@ def fetch_kp_index():
     if not r or not isinstance(r, list) or len(r) < 2:
         return None
     try:
-        # Последняя строка [time_tag, Kp, a_running, station_count]
         last = r[-1]
         kp = float(last[1])
-        # 3-дневный прогноз
         kp_forecast = []
         for row in r[-8:]:
             try:
                 kp_forecast.append(float(row[1]))
-            except: pass
+            except:
+                pass
         return {
             'kp': kp,
             'level': kp_to_level(kp),
@@ -439,7 +445,7 @@ def time_ago_from_ts(ms):
         return ''
 
 
-# ============ ИСТОРИЯ ДНЯ (Wikipedia) ============
+# ============ ИСТОРИЯ ДНЯ ============
 def fetch_on_this_day():
     today = datetime.date.today()
     url = f'https://api.wikimedia.org/feed/v1/wikipedia/ru/onthisday/selected/{today.month:02d}/{today.day:02d}'
@@ -509,7 +515,6 @@ def calendar_html(today):
 
 # ============ АРТ ПО ПОГОДЕ ============
 def generate_svg_art(kind='cloud'):
-    """Картинка подстраивается под погоду и время суток."""
     random.seed(datetime.datetime.now().strftime('%Y%m%d%H') + kind)
     hour = datetime.datetime.now().hour
     if 6 <= hour < 10:
@@ -567,7 +572,7 @@ def track_of_day(kind):
 def time_ago(dt):
     if dt == datetime.datetime.min: return ''
     try:
-        delta = datetime.datetime.now(dt.tzinfo) - dt
+        delta = datetime.datetime.now() - dt
         s = int(delta.total_seconds())
         if s < 60: return 'только что'
         if s < 3600: return f'{s // 60} мин'
@@ -654,8 +659,6 @@ def render_crypto(c):
 
 def render_iss(iss):
     if not iss: return '<div class="empty">Данные МКС недоступны</div>'
-    dir_icon = '🌍'
-    # Направление к Нальчику
     return (
         f'<div class="iss-hero">'
         f'<div class="iss-icon">🛰</div>'
@@ -791,7 +794,6 @@ def generate():
     holiday = HOLIDAYS.get((today.month, today.day))
     holiday_html = f'<div class="holiday">{holiday}</div>' if holiday else ''
 
-    # Собираем данные
     weather = fetch_weather()
     kind = weather['kind'] if weather else 'cloud'
     gh = golden_hour(weather)
@@ -808,7 +810,6 @@ def generate():
     days_ny = days_to_new_year()
     track = track_of_day(kind)
 
-    # Фон-режим
     aurora_class = ' aurora' if kp and kp['aurora_possible'] else ''
 
     news_block = render_news()
@@ -824,7 +825,6 @@ def generate():
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
 <meta name="theme-color" content="#0a0e1a">
 <style>
-/* CSS вставляется отдельно */
 {get_css()}
 </style>
 </head>
@@ -1122,7 +1122,6 @@ body.aurora::after{
 .quote-author{font-size:12px;color:var(--muted);text-align:right}
 .quote-author::before{content:'— '}
 
-/* ИСС */
 .iss-hero{display:flex;align-items:center;gap:14px;margin-bottom:12px}
 .iss-icon{font-size:44px;line-height:1;filter:drop-shadow(0 4px 16px rgba(96,165,250,0.4));animation:issFloat 4s ease-in-out infinite}
 @keyframes issFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
@@ -1131,7 +1130,6 @@ body.aurora::after{
 .iss-sub{font-size:11px;color:var(--muted);margin-top:2px}
 .iss-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);padding-top:10px;border-top:1px solid var(--border)}
 
-/* Kp */
 .kp-hero{text-align:center;margin-bottom:10px}
 .kp-value{font-size:44px;font-weight:200;letter-spacing:-0.03em;line-height:1;font-variant-numeric:tabular-nums}
 .kp-label{font-size:11px;color:var(--muted);margin-top:2px}
@@ -1140,7 +1138,6 @@ body.aurora::after{
 .kp-bar{flex:1;background:linear-gradient(180deg,var(--accent),var(--accent2));border-radius:3px;min-height:4px;opacity:0.7}
 .kp-axis{display:flex;justify-content:space-between;font-size:9px;color:var(--muted);margin-top:4px}
 
-/* AQ / UV */
 .aq-hero{text-align:center;margin-bottom:10px}
 .aq-value{font-size:44px;font-weight:200;letter-spacing:-0.03em;line-height:1;font-variant-numeric:tabular-nums}
 .aq-label{font-size:11px;color:var(--muted);margin-top:2px}
@@ -1148,14 +1145,12 @@ body.aurora::after{
 .aq-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;text-align:center}
 .aq-meta b{display:block;color:var(--muted);font-size:10px;font-weight:600;letter-spacing:0.5px;margin-bottom:2px}
 
-/* Earthquakes */
 .eq-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px}
 .eq-row:last-child{border-bottom:none}
 .eq-mag{font-weight:600;font-size:14px;min-width:36px;font-variant-numeric:tabular-nums}
 .eq-place{flex:1;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .eq-meta{color:var(--muted);font-size:11px;white-space:nowrap}
 
-/* History */
 .hist-row{display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);text-decoration:none;color:var(--text);transition:transform .15s}
 .hist-row:last-child{border-bottom:none}
 .hist-row:hover{transform:translateX(4px)}
@@ -1163,13 +1158,11 @@ body.aurora::after{
 .hist-year{font-weight:600;color:var(--accent2);font-size:13px;min-width:46px;font-variant-numeric:tabular-nums}
 .hist-text{flex:1;font-size:12px;line-height:1.4}
 
-/* Golden hour */
 .gh-block{text-align:center}
 .gh-title{font-size:12px;font-weight:600;color:var(--accent);margin-bottom:10px;letter-spacing:0.5px}
 .gh-row{font-size:13px;color:var(--muted);padding:4px 0}
 .gh-row b{color:var(--text);font-variant-numeric:tabular-nums;font-weight:500}
 
-/* Track */
 .track-card{display:flex;align-items:center;gap:12px;padding:10px;background:var(--panel2);border:1px solid var(--border);border-radius:12px;text-decoration:none;color:var(--text);transition:transform .15s,border-color .15s}
 .track-card:hover{transform:translateY(-2px);border-color:var(--accent)}
 .track-icon{font-size:28px;line-height:1}
@@ -1177,7 +1170,6 @@ body.aurora::after{
 .track-name{font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .track-artist{font-size:11px;color:var(--muted);margin-top:2px}
 
-/* Holiday */
 .holiday{grid-column:span 12;text-align:center;padding:12px 20px;background:linear-gradient(135deg,rgba(255,193,7,0.15),rgba(255,87,34,0.12));border:1px solid rgba(255,193,7,0.3);border-radius:16px;font-size:15px;font-weight:500;animation:holidayPulse 3s ease-in-out infinite}
 @keyframes holidayPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,193,7,0.3)}50%{box-shadow:0 0 30px 4px rgba(255,193,7,0.18)}}
 
@@ -1191,7 +1183,6 @@ body.aurora::after{
 def get_js(weather_kind):
     return f'''
 (function(){{
-  // ===== Часы =====
   function tick(){{
     const now = new Date();
     const msk = new Date(now.toLocaleString('en-US', {{timeZone:'Europe/Moscow'}}));
@@ -1207,7 +1198,6 @@ def get_js(weather_kind):
   tick();
   setInterval(tick, 1000);
 
-  // ===== Счётчики =====
   function counters(){{
     const now = new Date();
     const msk = new Date(now.toLocaleString('en-US', {{timeZone:'Europe/Moscow'}}));
@@ -1223,7 +1213,6 @@ def get_js(weather_kind):
   counters();
   setInterval(counters, 1000);
 
-  // ===== Тема =====
   let saved = localStorage.getItem('theme') || 'dark';
   if (!['dark','light'].includes(saved)) saved = 'dark';
   document.documentElement.setAttribute('data-theme', saved);
@@ -1237,7 +1226,6 @@ def get_js(weather_kind):
     btn.textContent = nxt === 'dark' ? '☀' : '🌙';
   }});
 
-  // ===== Звук часов =====
   let soundOn = localStorage.getItem('clockSound') === 'on';
   const sBtn = document.getElementById('soundBtn');
   sBtn.textContent = soundOn ? '🔊' : '🔇';
@@ -1264,7 +1252,6 @@ def get_js(weather_kind):
   }});
   setInterval(() => {{ if(soundOn) beep(); }}, 1000);
 
-  // ===== Canvas-фон по погоде =====
   const kind = '{weather_kind}';
   const canvas = document.getElementById('bgCanvas');
   if(canvas){{
