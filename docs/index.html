@@ -41,6 +41,16 @@ body.aurora::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:n
 @keyframes fadeInUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 .empty{color:var(--muted);font-size:13px;text-align:center;padding:12px}
 .card-clock{grid-column:span 4;min-height:220px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:30px 24px}
+.card-about{grid-column:span 12}
+.card-about details{padding:10px 0;border-bottom:1px solid var(--border)}
+.card-about details:last-child{border-bottom:none}
+.card-about summary{cursor:pointer;font-size:14px;font-weight:500;padding:6px 0;color:var(--text);transition:color .15s}
+.card-about summary:hover{color:var(--accent)}
+.card-about summary::marker{color:var(--accent)}
+.card-about p,.card-about ul{font-size:13px;color:var(--muted);line-height:1.6;padding:8px 0 8px 8px;margin:0}
+.card-about ul{list-style:none;padding-left:0}
+.card-about ul li{padding:3px 0}
+.card-about p b,.card-about ul b{color:var(--text)}
 .card-weather{grid-column:span 4}.card-iss{grid-column:span 4}.card-kp{grid-column:span 4}.card-aq{grid-column:span 4}.card-uv{grid-column:span 4}
 .card-currency{grid-column:span 3}.card-crypto{grid-column:span 3}
 .card-news{grid-column:span 6;grid-row:span 2}
@@ -52,13 +62,16 @@ body.aurora::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:n
 .card-planes{grid-column:span 6}.card-article{grid-column:span 6}
 .card-habits{grid-column:span 4}.card-todo{grid-column:span 4}.card-notes{grid-column:span 4}
 .card-pomo{grid-column:span 3;text-align:center}.card-mood{grid-column:span 3;text-align:center}.card-water{grid-column:span 3;text-align:center}.card-conv{grid-column:span 3}
-.card-tools{grid-column:span 4}.card-dates{grid-column:span 4}.card-issmap{grid-column:span 4}
+.card-tools{grid-column:span 3}.card-dates{grid-column:span 3}.card-issmap{grid-column:span 3}
+.card-radio{grid-column:span 3}
+.card-sleeptrack{grid-column:span 3}
+.card-backup{grid-column:span 3}
 @media(max-width:1000px){
   .card-clock,.card-weather,.card-iss,.card-kp,.card-aq,.card-uv{grid-column:span 6}
   .card-currency,.card-crypto,.card-calendar,.card-art,.card-gh,.card-moon,.card-ny,.card-track{grid-column:span 3}
-  .card-news,.card-eq,.card-history,.card-quote{grid-column:span 6}
+  .card-news,.card-eq,.card-history,.card-quote,.card-about{grid-column:span 6}
   .card-solar,.card-apod,.card-asteroids,.card-launch,.card-museum,.card-planes,.card-article{grid-column:span 6}
-  .card-cat,.card-sleep,.card-dice,.card-fact{grid-column:span 3}
+  .card-cat,.card-sleep,.card-dice,.card-fact,.card-radio,.card-sleeptrack,.card-backup{grid-column:span 3}
   .card-habits,.card-todo,.card-notes,.card-tools,.card-dates,.card-issmap{grid-column:span 6}
   .card-pomo,.card-mood,.card-water,.card-conv{grid-column:span 3}
 }
@@ -178,13 +191,22 @@ body.aurora::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:n
 .article-title{font-size:15px;font-weight:600;margin-bottom:8px;line-height:1.3}.article-card:hover .article-title{color:var(--accent)}
 .article-desc{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:8px}
 .article-source{font-size:10px;color:var(--muted);opacity:0.7}
-
-/* ISS map */
 .issmap-wrap{width:100%;border-radius:12px;overflow:hidden;background:#0a1628;margin-bottom:10px}
 .issmap{width:100%;height:auto;display:block;aspect-ratio:2/1}
 .issmap-info{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-family:ui-monospace,monospace}
-
-/* Tools */
+.radio-list{display:flex;flex-direction:column;gap:6px}
+.radio-btn{background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:10px;cursor:pointer;font-size:13px;text-align:left;transition:border-color .15s;font-family:inherit}
+.radio-btn:hover{border-color:var(--accent);background:rgba(96,165,250,0.08)}
+.radio-now{font-size:12px;color:var(--accent);text-align:center;margin-bottom:6px;font-weight:500}
+.sleeptrack-inputs{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.sleeptrack-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted)}
+.sleeptrack-row input{background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:8px;font-family:inherit;font-size:13px}
+.sleeptrack-row input:focus{outline:none;border-color:var(--accent)}
+.sleeptrack-result{font-size:22px;font-weight:300;color:var(--accent);text-align:center;padding:8px 0;font-variant-numeric:tabular-nums}
+.sleeptrack-week{display:flex;gap:4px;justify-content:space-between;align-items:flex-end;height:40px;padding-top:10px;border-top:1px solid var(--border)}
+.sleeptrack-bar{flex:1;background:linear-gradient(180deg,var(--accent),var(--accent2));border-radius:4px 4px 0 0;min-height:4px;position:relative;transition:height .3s}
+.backup-note{font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:12px}
+.backup-status{font-size:11px;color:var(--good);text-align:center;margin-top:8px;min-height:14px}
 .tool-input-row{display:flex;gap:6px;margin-top:10px}
 .tool-input-row input{flex:1;background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:10px;font-size:13px;font-family:inherit}
 .tool-input-row input:focus{outline:none;border-color:var(--accent)}
@@ -276,16 +298,61 @@ body.aurora::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:n
     </div>
   </div>
 
-  <div class="card card-weather"><h3>🌤 Погода · Нальчик</h3><div class="wx-hero"><div class="wx-icon">⛈️</div><div><div class="wx-temp">16°</div><div class="wx-feels">ощущается 15°</div></div></div><div class="wx-meta"><div class="wx-item"><span>💧</span><b>72%</b></div><div class="wx-item"><span>💨</span><b>4</b><small>км/ч</small></div><div class="wx-item"><span>🔽</span><b>1018</b><small>мм</small></div></div><div class="wx-sun"><div><span>🌅</span> 05:58 AM</div><div><span>🌇</span> 05:54 PM</div></div><div class="wx-forecast"><div class="fc-day"><div class="fc-date">09.27</div><div class="fc-icon">⛈️</div><div class="fc-temps"><span class="fc-max">↑18°</span><span class="fc-min">↓11°</span></div></div><div class="fc-day"><div class="fc-date">09.28</div><div class="fc-icon">⛈️</div><div class="fc-temps"><span class="fc-max">↑17°</span><span class="fc-min">↓10°</span></div></div><div class="fc-day"><div class="fc-date">09.29</div><div class="fc-icon">⛈️</div><div class="fc-temps"><span class="fc-max">↑11°</span><span class="fc-min">↓8°</span></div></div></div></div>
-  <div class="card card-iss"><h3>🛰 МКС</h3><div class="iss-hero"><div class="iss-icon">🛰</div><div><div class="iss-dist">18313 <span class="iss-dist-unit">км от тебя</span></div><div class="iss-sub">высота 435 км · 27538 км/ч</div></div></div><div class="iss-meta"><span>📍 -39.99°, -116.36°</span><span>👁 daylight</span></div></div>
-  <div class="card card-kp"><h3>🌌 Магнитное поле</h3><div class="kp-hero"><div class="kp-value" style="color:#4ade80">0.3</div><div class="kp-label">Kp-индекс</div></div><div class="kp-level" style="color:#4ade80">Спокойно</div><div class="kp-bars"><div class="kp-bar" style="height:11%" title="Kp=1.0"></div><div class="kp-bar" style="height:11%" title="Kp=1.0"></div><div class="kp-bar" style="height:7%" title="Kp=0.67"></div><div class="kp-bar" style="height:7%" title="Kp=0.67"></div><div class="kp-bar" style="height:3%" title="Kp=0.33"></div><div class="kp-bar" style="height:3%" title="Kp=0.33"></div></div><div class="kp-axis"><span>6ч назад</span><span>сейчас</span></div></div>
-  <div class="card card-aq"><h3>🌬 Воздух</h3><div class="aq-hero"><div class="aq-value" style="color:#86efac">35</div><div class="aq-label">AQI</div></div><div class="aq-level" style="color:#86efac">Хороший</div><div class="aq-meta"><div><b>PM2.5</b> 12.6</div><div><b>PM10</b> 23.6</div></div></div>
-  <div class="card card-uv"><h3>🌡 УФ</h3><div class="aq-hero"><div class="aq-value" style="color:#4ade80">0.1</div><div class="aq-label">УФ</div></div><div class="aq-level" style="color:#4ade80">Низкий</div><div class="aq-meta"><div><b>Макс.</b> 4</div></div></div>
+  <div class="card card-about">
+    <h3>📖 О сайте · как пользоваться</h3>
+    <details>
+      <summary>Что это такое?</summary>
+      <p>Личный дашборд-помощник. Живёт на GitHub Pages, обновляется автоматически каждый час. Показывает погоду, новости, космос, курсы — и хранит твои заметки, привычки, задачи.</p>
+    </details>
+    <details>
+      <summary>Как пользоваться?</summary>
+      <ul>
+        <li>🎯 <b>Привычки</b> — добавляй и отмечай каждый день</li>
+        <li>✅ <b>Задачи</b> — пиши что надо сделать</li>
+        <li>📝 <b>Заметки</b> — сохраняются сами</li>
+        <li>🍅 <b>Помодоро</b> — 25 мин работа, 5 отдых</li>
+        <li>💧 <b>Вода</b> — отмечай выпитые стаканы</li>
+        <li>😊 <b>Настроение</b> — 1 клик в день</li>
+        <li>💤 <b>Мой сон</b> — вводи лёг/встал, смотри график</li>
+        <li>⏳ <b>Счётчики дат</b> — «до отпуска N дней»</li>
+        <li>💾 <b>Бэкап</b> — сохрани все данные в JSON</li>
+      </ul>
+    </details>
+    <details>
+      <summary>🔒 Приватность — что важно знать</summary>
+      <p><b>Все твои данные хранятся только в браузере</b> (localStorage). Никто — ни автор сайта, ни GitHub — не видит твои заметки, привычки, задачи.</p>
+      <p><b>Важно:</b> если очистишь кэш Chrome — данные пропадут. Сделай бэкап!</p>
+    </details>
+    <details>
+      <summary>🌐 Источники данных</summary>
+      <ul>
+        <li>🌤 Погода — wttr.in</li>
+        <li>💱 Курсы — ЦБ РФ</li>
+        <li>💰 Крипта — CoinGecko</li>
+        <li>📰 Новости — Lenta, RBC, TASS, Habr, Известия</li>
+        <li>🛰 МКС — WhereTheISS</li>
+        <li>🌌 Магнитное поле — NOAA</li>
+        <li>🌬 Воздух, УФ — Open-Meteo</li>
+        <li>🌍 Землетрясения — USGS</li>
+        <li>🚀 Ракеты — TheSpaceDevs</li>
+        <li>🌞 Солнце — NASA SDO</li>
+        <li>🎨 Картина — The Met Museum</li>
+        <li>🐱 Кот — TheCatAPI</li>
+        <li>📖 История — Wikipedia</li>
+      </ul>
+    </details>
+  </div>
+
+  <div class="card card-weather"><h3>🌤 Погода · Нальчик</h3><div class="wx-hero"><div class="wx-icon">⛈️</div><div><div class="wx-temp">17°</div><div class="wx-feels">ощущается 17°</div></div></div><div class="wx-meta"><div class="wx-item"><span>💧</span><b>86%</b></div><div class="wx-item"><span>💨</span><b>10</b><small>км/ч</small></div><div class="wx-item"><span>🔽</span><b>1019</b><small>мм</small></div></div><div class="wx-sun"><div><span>🌅</span> 05:58 AM</div><div><span>🌇</span> 05:54 PM</div></div><div class="wx-forecast"><div class="fc-day"><div class="fc-date">09.27</div><div class="fc-icon">⛈️</div><div class="fc-temps"><span class="fc-max">↑17°</span><span class="fc-min">↓11°</span></div></div><div class="fc-day"><div class="fc-date">09.28</div><div class="fc-icon">⛈️</div><div class="fc-temps"><span class="fc-max">↑17°</span><span class="fc-min">↓10°</span></div></div><div class="fc-day"><div class="fc-date">09.29</div><div class="fc-icon">⛈️</div><div class="fc-temps"><span class="fc-max">↑13°</span><span class="fc-min">↓9°</span></div></div></div></div>
+  <div class="card card-iss"><h3>🛰 МКС</h3><div class="iss-hero"><div class="iss-icon">🛰</div><div><div class="iss-dist">6735 <span class="iss-dist-unit">км от тебя</span></div><div class="iss-sub">высота 428 км · 27569 км/ч</div></div></div><div class="iss-meta"><span>📍 39.82°, -41.17°</span><span>👁 daylight</span></div></div>
+  <div class="card card-kp"><h3>🌌 Магнитное поле</h3><div class="kp-hero"><div class="kp-value" style="color:#4ade80">1.3</div><div class="kp-label">Kp-индекс</div></div><div class="kp-level" style="color:#4ade80">Спокойно</div><div class="kp-bars"><div class="kp-bar" style="height:14%" title="Kp=1.33"></div><div class="kp-bar" style="height:14%" title="Kp=1.33"></div><div class="kp-bar" style="height:14%" title="Kp=1.33"></div><div class="kp-bar" style="height:14%" title="Kp=1.33"></div><div class="kp-bar" style="height:14%" title="Kp=1.33"></div><div class="kp-bar" style="height:14%" title="Kp=1.33"></div></div><div class="kp-axis"><span>6ч назад</span><span>сейчас</span></div></div>
+  <div class="card card-aq"><h3>🌬 Воздух</h3><div class="aq-hero"><div class="aq-value" style="color:#86efac">37</div><div class="aq-label">AQI</div></div><div class="aq-level" style="color:#86efac">Хороший</div><div class="aq-meta"><div><b>PM2.5</b> 13.7</div><div><b>PM10</b> 23.8</div></div></div>
+  <div class="card card-uv"><h3>🌡 УФ</h3><div class="aq-hero"><div class="aq-value" style="color:#4ade80">0.0</div><div class="aq-label">УФ</div></div><div class="aq-level" style="color:#4ade80">Низкий</div><div class="aq-meta"><div><b>Макс.</b> 4</div></div></div>
   <div class="card card-currency"><h3>💱 Курсы ЦБ</h3><div class="cur-row"><span class="cur-flag">🇺🇸</span><span class="cur-code">USD</span><span class="cur-val">84.34 ₽</span></div><div class="cur-row"><span class="cur-flag">🇪🇺</span><span class="cur-code">EUR</span><span class="cur-val">95.87 ₽</span></div><div class="cur-row"><span class="cur-flag">🇨🇳</span><span class="cur-code">CNY</span><span class="cur-val">12.54 ₽</span></div></div>
-  <div class="card card-crypto"><h3>💰 Крипта</h3><div class="cur-row"><span class="cur-flag">₿</span><span class="cur-code">BTC</span><span class="cur-val">$84,740</span><span class="cur-chg" style="color:var(--good)">▲ 0.9%</span></div><div class="cur-row"><span class="cur-flag">Ξ</span><span class="cur-code">ETH</span><span class="cur-val">$2,690</span><span class="cur-chg" style="color:var(--good)">▲ 0.1%</span></div><div class="cur-row"><span class="cur-flag">💎</span><span class="cur-code">TON</span><span class="cur-val">$1.59</span><span class="cur-chg" style="color:var(--good)">▲ 7.8%</span></div></div>
-  <div class="card card-news"><h3>📰 Новости · 5 источников</h3><div class="news-grid"><a class="news-card" href="https://lenta.ru/news/2026/09/27/v-mid-irana-prigrozili-ssha-voynoy-sudnogo-dnya/" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">Lenta</span><span class="news-ago">2 мин</span></div><div class="news-title">В МИД Ирана пригрозили США войной Судного дня</div></a><a class="news-card" href="https://lenta.ru/news/2026/09/27/pevitsa-shakira-rezko-podnyala-tseny-na-otdyh-v-egipte/" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">Lenta</span><span class="news-ago">3 мин</span></div><div class="news-title">Певица Шакира резко подняла цены на отдых в Египте</div></a><a class="news-card" href="https://tass.ru/mezhdunarodnaya-panorama/28156347" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">TASS</span><span class="news-ago">4 мин</span></div><div class="news-title">Арагчи назвал ошибочными утверждения США о нескольких центрах власти в Иране</div></a><a class="news-card" href="https://lenta.ru/news/2026/09/27/tri-cheloveka-popali-v-smertelnoe-dtp-v-rossiyskom-regione/" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">Lenta</span><span class="news-ago">4 мин</span></div><div class="news-title">Три человека попали в смертельное ДТП в российском регионе</div></a><a class="news-card" href="https://www.rbc.ru/politics/27/09/2026/6ab91ad8667ef03ad6dee832" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">RBC</span><span class="news-ago">5 мин</span></div><div class="news-title">Трамп заявил о вывозе рекордного объема нефти через Ормузский пролив</div><div class="news-desc">По словам Трампа, прошедшей ночью США вывезли через Ормузский пролив больше нефти, чем до войны с Ираном. До этого он отверг пр...</div></a><a class="news-card" href="https://tass.ru/obschestvo/28156321" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">TASS</span><span class="news-ago">6 мин</span></div><div class="news-title">В Ницце пляж переименовали в честь Брижит Бардо в память о вкладе в защиту животных</div><div class="news-desc">Глава городской администрации Эрик Сьотти отметил, что этот шаг является частью политики по расширению городского пространства ...</div></a><a class="news-card" href="https://tass.ru/obschestvo/28156333" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">TASS</span><span class="news-ago">6 мин</span></div><div class="news-title">Родившая тройню минчанка после обращения к Лукашенко получила в подарок квартиру</div><div class="news-desc">Женщина записала видео с просьбой предоставить ее семье жилье</div></a><a class="news-card" href="https://tass.ru/obschestvo/28156323" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">TASS</span><span class="news-ago">7 мин</span></div><div class="news-title">В Ингушетии более 180 детей получили хирургическую помощь от благотворителей</div><div class="news-desc">Специалисты провели 79 запланированных операций</div></a><a class="news-card" href="https://tass.ru/politika/28156339" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">TASS</span><span class="news-ago">7 мин</span></div><div class="news-title">Миронов назвал причины низких результатов &quot;Справедливой России&quot; на выборах</div><div class="news-desc">Лидер партии отметил при этом, что с оценкой не нужно спешить до подробного анализа данных по регионам</div></a><a class="news-card" href="https://lenta.ru/news/2026/09/27/v-britanii-posle-vzryva-u-bazy-vvs-ssha-nachalis-zaderzhaniya/" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">Lenta</span><span class="news-ago">10 мин</span></div><div class="news-title">В Британии после взрыва у базы ВВС США начались задержания</div></a><a class="news-card" href="https://lenta.ru/news/2026/09/27/roberto-karlos-zayavil-o-potere-zarabotannyh-deneg/" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">Lenta</span><span class="news-ago">14 мин</span></div><div class="news-title">Роберто Карлос заявил о потере заработанных денег</div></a><a class="news-card" href="https://www.rbc.ru/politics/27/09/2026/6ab92265be0c42a4cf1da0ef" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">RBC</span><span class="news-ago">14 мин</span></div><div class="news-title">Токаев поручил провести реформу армии после гибели 14 военных на учениях</div><div class="news-desc">После гибели военных в ходе учений на Каспии Токаев потребовал перестроить систему командования и провести комплексную проверку...</div></a></div></div>
+  <div class="card card-crypto"><h3>💰 Крипта</h3><div class="cur-row"><span class="cur-flag">₿</span><span class="cur-code">BTC</span><span class="cur-val">$84,476</span><span class="cur-chg" style="color:var(--good)">▲ 0.6%</span></div><div class="cur-row"><span class="cur-flag">Ξ</span><span class="cur-code">ETH</span><span class="cur-val">$2,687</span><span class="cur-chg" style="color:var(--bad)">▼ 0.1%</span></div><div class="cur-row"><span class="cur-flag">💎</span><span class="cur-code">TON</span><span class="cur-val">$1.61</span><span class="cur-chg" style="color:var(--good)">▲ 9.0%</span></div></div>
+  <div class="card card-news"><h3>📰 Новости · 5 источников</h3><div class="news-grid"><a class="news-card" href="https://www.rbc.ru/sport/27/09/2026/6ab91a629a79475a25de6ecd" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">RBC</span><span class="news-ago">2 мин</span></div><div class="news-title">Даниил Медведев третьим из россиян вышел в полуфинал турнира в Китае</div><div class="news-desc">Медведев в трех сетах победил 108-ю ракетку мира Вонга и сыграет за выход в финал с Сафиуллиным</div></a><a class="news-card" href="https://tass.ru/obschestvo/28156387" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">TASS</span><span class="news-ago">5 мин</span></div><div class="news-title">В России с 1 января будут гарантировать выплаты по страхованию жизни</div><div class="news-desc">В случае смерти сумма может составить до 10 млн рублей, при наступлении иных страховых обстоятельств и при окончании срока поли...</div></a><a class="news-card" href="https://www.rbc.ru/rbcfreenews/6ab93065cde3c624e5110cbe" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">RBC</span><span class="news-ago">6 мин</span></div><div class="news-title">Минобороны сообщило об ударе по судну с грузами для ВСУ в Одессу</div><div class="news-desc">Вооруженные силы (ВС) России поразили сухогруз, следовавший в порт Одессы с грузами двойного назначения для ВСУ, сообщило Миноб...</div></a><a class="news-card" href="https://iz.ru/2174405/2026-09-27/solist-gruppy-maneskin-damiano-david-zhenilsia-na-aktrise-dav-kameron" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">Известия</span><span class="news-ago">9 мин</span></div><div class="news-title">Солист группы Maneskin Дамиано Давид женился на актрисе Дав Камерон</div><div class="news-desc">Солист группы Maneskin Дамиано Давид и его 30-летняя избранница, актриса Дав Кэмерон, поженились в ходе свадебной церемонии в И...</div></a><a class="news-card" href="https://tass.ru/mezhdunarodnaya-panorama/28156385" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">TASS</span><span class="news-ago">9 мин</span></div><div class="news-title">Axios: очередной раунд непрямых переговоров между США и Ираном пройдет 28 сентября</div></a><a class="news-card" href="https://tass.ru/mezhdunarodnaya-panorama/28156381" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">TASS</span><span class="news-ago">10 мин</span></div><div class="news-title">Трамп заявил, что всегда думает над возобновлением ударов по Ирану</div></a><a class="news-card" href="https://tass.ru/politika/28156377" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">TASS</span><span class="news-ago">11 мин</span></div><div class="news-title">Мирошник: Киев использовал трибуну ГА ООН для циничной лжи об Алешках</div><div class="news-desc">ВСУ непрерывно бомбят, обстреливают и дистанционно минируют город уже более двух лет, сообщил посол по особым поручениям МИД РФ</div></a><a class="news-card" href="https://www.rbc.ru/sport/27/09/2026/6ab924a69a794752c6bfda5b" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">RBC</span><span class="news-ago">11 мин</span></div><div class="news-title">«Зенит» вырвал победу у экс-клуба Слуцкого в серии пенальти</div><div class="news-desc">Основное время товарищеского матча в Шанхае завершилось со счетом 0:0. В серии пенальти точнее оказались футболисты «Зенита» (4:3)</div></a><a class="news-card" href="https://lenta.ru/news/2026/09/27/v-rossii-vyskazalis-o-vozmozhnosti-evropy-uchastvovat-v-peregovorah-po-ukraine/" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">Lenta</span><span class="news-ago">11 мин</span></div><div class="news-title">В России высказались о возможности Европы участвовать в переговорах по Украине</div></a><a class="news-card" href="https://tass.ru/mezhdunarodnaya-panorama/28156373" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">TASS</span><span class="news-ago">14 мин</span></div><div class="news-title">Трамп анонсировал переговоры с Ираном на следующей неделе</div></a><a class="news-card" href="https://lenta.ru/news/2026/09/27/vnuk-petrosyana-kupil-kvartiru-za-140-millionov-rubley-v-lyuksovom-rayone-nyu-yorka/" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">Lenta</span><span class="news-ago">19 мин</span></div><div class="news-title">Внук Петросяна купил квартиру за 140 миллионов рублей в люксовом районе Нью-Йорка</div></a><a class="news-card" href="https://iz.ru/2174430/2026-09-27/armiia-rossii-porazila-dva-tcentra-obrabotki-dannykh-v-kieve" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">Известия</span><span class="news-ago">20 мин</span></div><div class="news-title">Армия России поразила два центра обработки данных в Киеве</div><div class="news-desc">Армия России в результате ударов беспилотников поразила два центра обработки данных в Киеве, принадлежавшие компаниям «Омега Те...</div></a></div></div>
   <div class="card card-calendar"><h3>📅 Сентябрь 2026</h3><div class="cal-month">Сентябрь 2026</div><div class="cal-grid"><div class="cal-head">Пн</div><div class="cal-head">Вт</div><div class="cal-head">Ср</div><div class="cal-head">Чт</div><div class="cal-head">Пт</div><div class="cal-head">Сб</div><div class="cal-head">Вс</div><div class="cal-cell cal-empty"></div><div class="cal-cell" title="📚 День знаний">1<span class="cal-hol">•</span></div><div class="cal-cell">2</div><div class="cal-cell">3</div><div class="cal-cell">4</div><div class="cal-cell cal-weekend">5</div><div class="cal-cell cal-weekend">6</div><div class="cal-cell">7</div><div class="cal-cell">8</div><div class="cal-cell">9</div><div class="cal-cell">10</div><div class="cal-cell">11</div><div class="cal-cell cal-weekend">12</div><div class="cal-cell cal-weekend">13</div><div class="cal-cell">14</div><div class="cal-cell">15</div><div class="cal-cell">16</div><div class="cal-cell">17</div><div class="cal-cell">18</div><div class="cal-cell cal-weekend">19</div><div class="cal-cell cal-weekend">20</div><div class="cal-cell">21</div><div class="cal-cell">22</div><div class="cal-cell">23</div><div class="cal-cell">24</div><div class="cal-cell">25</div><div class="cal-cell cal-weekend">26</div><div class="cal-cell cal-today">27</div><div class="cal-cell">28</div><div class="cal-cell">29</div><div class="cal-cell">30</div></div></div>
-  <div class="card card-art"><svg viewBox="0 0 400 240" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><filter id="b166790"><feGaussianBlur stdDeviation="26"/></filter><radialGradient id="v166790" cx="50%" cy="50%" r="70%"><stop offset="60%" stop-color="rgba(0,0,0,0)"/><stop offset="100%" stop-color="rgba(0,0,0,0.55)"/></radialGradient></defs><rect width="400" height="240" fill="#0a0e1a"/><g filter="url(#b166790)"><circle cx="213" cy="134" r="155" fill="#00f2fe" opacity="0.55"/><circle cx="275" cy="120" r="125" fill="#00f2fe" opacity="0.30"/><circle cx="285" cy="183" r="112" fill="#4facfe" opacity="0.36"/><circle cx="75" cy="221" r="93" fill="#4facfe" opacity="0.45"/><circle cx="68" cy="47" r="130" fill="#4facfe" opacity="0.33"/><circle cx="94" cy="115" r="87" fill="#4facfe" opacity="0.63"/><circle cx="342" cy="53" r="127" fill="#00f2fe" opacity="0.44"/></g><line x1="232" y1="142" x2="3" y2="229" stroke="white" stroke-width="0.6" opacity="0.12"/><line x1="395" y1="41" x2="68" y2="94" stroke="white" stroke-width="0.6" opacity="0.26"/><line x1="27" y1="218" x2="294" y2="184" stroke="white" stroke-width="0.9" opacity="0.26"/><line x1="116" y1="133" x2="152" y2="136" stroke="white" stroke-width="0.4" opacity="0.20"/><line x1="18" y1="235" x2="224" y2="85" stroke="white" stroke-width="0.6" opacity="0.28"/><line x1="222" y1="6" x2="204" y2="31" stroke="white" stroke-width="0.7" opacity="0.27"/><line x1="118" y1="229" x2="172" y2="29" stroke="white" stroke-width="0.8" opacity="0.15"/><line x1="221" y1="204" x2="387" y2="35" stroke="white" stroke-width="0.6" opacity="0.22"/><line x1="237" y1="84" x2="300" y2="1" stroke="white" stroke-width="0.8" opacity="0.13"/><line x1="2" y1="141" x2="123" y2="74" stroke="white" stroke-width="1.0" opacity="0.24"/><circle cx="42" cy="168" r="1.9" fill="white" opacity="0.54"/><circle cx="380" cy="126" r="1.2" fill="white" opacity="0.69"/><circle cx="6" cy="133" r="1.3" fill="white" opacity="0.24"/><circle cx="264" cy="17" r="0.8" fill="white" opacity="0.69"/><circle cx="310" cy="202" r="1.4" fill="white" opacity="0.36"/><circle cx="95" cy="125" r="0.5" fill="white" opacity="0.41"/><circle cx="30" cy="198" r="0.6" fill="white" opacity="0.63"/><circle cx="371" cy="240" r="0.6" fill="white" opacity="0.20"/><circle cx="326" cy="147" r="1.1" fill="white" opacity="0.56"/><circle cx="1" cy="106" r="0.7" fill="white" opacity="0.65"/><circle cx="124" cy="175" r="0.7" fill="white" opacity="0.67"/><circle cx="100" cy="45" r="1.0" fill="white" opacity="0.52"/><circle cx="36" cy="131" r="1.0" fill="white" opacity="0.44"/><circle cx="293" cy="69" r="1.6" fill="white" opacity="0.34"/><circle cx="330" cy="159" r="1.9" fill="white" opacity="0.29"/><circle cx="175" cy="233" r="1.0" fill="white" opacity="0.41"/><circle cx="388" cy="155" r="0.5" fill="white" opacity="0.48"/><circle cx="127" cy="41" r="1.9" fill="white" opacity="0.61"/><circle cx="381" cy="54" r="0.8" fill="white" opacity="0.20"/><circle cx="149" cy="143" r="1.9" fill="white" opacity="0.64"/><circle cx="267" cy="122" r="1.1" fill="white" opacity="0.55"/><circle cx="91" cy="156" r="2.0" fill="white" opacity="0.61"/><circle cx="262" cy="173" r="0.8" fill="white" opacity="0.49"/><circle cx="183" cy="79" r="1.1" fill="white" opacity="0.60"/><circle cx="172" cy="40" r="0.8" fill="white" opacity="0.32"/><circle cx="91" cy="187" r="1.4" fill="white" opacity="0.67"/><circle cx="286" cy="200" r="1.3" fill="white" opacity="0.27"/><circle cx="118" cy="99" r="1.5" fill="white" opacity="0.41"/><circle cx="281" cy="240" r="1.8" fill="white" opacity="0.34"/><circle cx="101" cy="162" r="1.1" fill="white" opacity="0.59"/><circle cx="346" cy="207" r="0.5" fill="white" opacity="0.27"/><circle cx="374" cy="11" r="1.8" fill="white" opacity="0.32"/><circle cx="390" cy="160" r="1.3" fill="white" opacity="0.68"/><circle cx="130" cy="42" r="1.5" fill="white" opacity="0.40"/><circle cx="106" cy="221" r="1.6" fill="white" opacity="0.54"/><circle cx="131" cy="15" r="1.3" fill="white" opacity="0.44"/><circle cx="159" cy="83" r="0.9" fill="white" opacity="0.34"/><circle cx="200" cy="115" r="1.3" fill="white" opacity="0.30"/><circle cx="48" cy="191" r="1.7" fill="white" opacity="0.55"/><circle cx="333" cy="32" r="1.5" fill="white" opacity="0.43"/><circle cx="69" cy="16" r="1.5" fill="white" opacity="0.56"/><circle cx="324" cy="154" r="0.5" fill="white" opacity="0.67"/><circle cx="210" cy="33" r="1.0" fill="white" opacity="0.40"/><circle cx="254" cy="80" r="1.4" fill="white" opacity="0.28"/><circle cx="308" cy="87" r="0.8" fill="white" opacity="0.52"/><circle cx="199" cy="133" r="1.5" fill="white" opacity="0.55"/><circle cx="247" cy="28" r="1.1" fill="white" opacity="0.53"/><circle cx="243" cy="159" r="2.0" fill="white" opacity="0.23"/><circle cx="381" cy="69" r="1.6" fill="white" opacity="0.44"/><circle cx="9" cy="4" r="1.2" fill="white" opacity="0.51"/><rect width="400" height="240" fill="url(#v166790)"/></svg><div class="art-label">🎨 по погоде</div></div>
+  <div class="card card-art"><svg viewBox="0 0 400 240" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><filter id="b857394"><feGaussianBlur stdDeviation="26"/></filter><radialGradient id="v857394" cx="50%" cy="50%" r="70%"><stop offset="60%" stop-color="rgba(0,0,0,0)"/><stop offset="100%" stop-color="rgba(0,0,0,0.55)"/></radialGradient></defs><rect width="400" height="240" fill="#0a0e1a"/><g filter="url(#b857394)"><circle cx="173" cy="126" r="116" fill="#00f2fe" opacity="0.55"/><circle cx="316" cy="237" r="112" fill="#4facfe" opacity="0.52"/><circle cx="102" cy="147" r="118" fill="#00f2fe" opacity="0.65"/><circle cx="65" cy="53" r="110" fill="#00f2fe" opacity="0.42"/><circle cx="397" cy="119" r="142" fill="#43e97b" opacity="0.55"/><circle cx="363" cy="29" r="160" fill="#4facfe" opacity="0.66"/><circle cx="161" cy="15" r="104" fill="#43e97b" opacity="0.53"/></g><line x1="202" y1="139" x2="9" y2="69" stroke="white" stroke-width="0.7" opacity="0.26"/><line x1="173" y1="30" x2="53" y2="36" stroke="white" stroke-width="0.5" opacity="0.16"/><line x1="384" y1="237" x2="277" y2="42" stroke="white" stroke-width="0.3" opacity="0.24"/><line x1="129" y1="203" x2="198" y2="77" stroke="white" stroke-width="1.0" opacity="0.19"/><line x1="384" y1="9" x2="248" y2="165" stroke="white" stroke-width="0.9" opacity="0.16"/><line x1="199" y1="31" x2="252" y2="72" stroke="white" stroke-width="0.4" opacity="0.15"/><line x1="357" y1="58" x2="213" y2="182" stroke="white" stroke-width="0.5" opacity="0.11"/><line x1="146" y1="17" x2="329" y2="38" stroke="white" stroke-width="0.4" opacity="0.26"/><line x1="54" y1="33" x2="16" y2="176" stroke="white" stroke-width="0.4" opacity="0.15"/><line x1="368" y1="67" x2="113" y2="66" stroke="white" stroke-width="0.9" opacity="0.20"/><circle cx="168" cy="134" r="0.5" fill="white" opacity="0.44"/><circle cx="224" cy="103" r="1.8" fill="white" opacity="0.47"/><circle cx="10" cy="154" r="1.0" fill="white" opacity="0.49"/><circle cx="83" cy="15" r="0.5" fill="white" opacity="0.54"/><circle cx="280" cy="207" r="0.6" fill="white" opacity="0.37"/><circle cx="132" cy="21" r="1.5" fill="white" opacity="0.30"/><circle cx="28" cy="62" r="1.9" fill="white" opacity="0.54"/><circle cx="399" cy="85" r="0.7" fill="white" opacity="0.69"/><circle cx="382" cy="71" r="0.9" fill="white" opacity="0.53"/><circle cx="100" cy="94" r="1.2" fill="white" opacity="0.69"/><circle cx="285" cy="164" r="1.5" fill="white" opacity="0.29"/><circle cx="36" cy="47" r="1.4" fill="white" opacity="0.68"/><circle cx="148" cy="92" r="0.8" fill="white" opacity="0.59"/><circle cx="195" cy="238" r="0.6" fill="white" opacity="0.25"/><circle cx="329" cy="2" r="1.4" fill="white" opacity="0.64"/><circle cx="357" cy="60" r="1.8" fill="white" opacity="0.56"/><circle cx="257" cy="9" r="0.9" fill="white" opacity="0.23"/><circle cx="325" cy="38" r="0.8" fill="white" opacity="0.45"/><circle cx="354" cy="70" r="0.8" fill="white" opacity="0.28"/><circle cx="226" cy="207" r="1.3" fill="white" opacity="0.48"/><circle cx="335" cy="44" r="0.7" fill="white" opacity="0.44"/><circle cx="185" cy="143" r="1.4" fill="white" opacity="0.21"/><circle cx="107" cy="187" r="0.9" fill="white" opacity="0.60"/><circle cx="132" cy="17" r="1.7" fill="white" opacity="0.69"/><circle cx="108" cy="59" r="1.4" fill="white" opacity="0.30"/><circle cx="215" cy="221" r="0.8" fill="white" opacity="0.35"/><circle cx="355" cy="69" r="1.1" fill="white" opacity="0.26"/><circle cx="193" cy="25" r="1.7" fill="white" opacity="0.62"/><circle cx="286" cy="91" r="0.6" fill="white" opacity="0.46"/><circle cx="88" cy="200" r="0.7" fill="white" opacity="0.41"/><circle cx="371" cy="8" r="1.4" fill="white" opacity="0.64"/><circle cx="220" cy="104" r="2.0" fill="white" opacity="0.25"/><circle cx="368" cy="114" r="1.0" fill="white" opacity="0.30"/><circle cx="368" cy="229" r="1.8" fill="white" opacity="0.34"/><circle cx="278" cy="47" r="1.0" fill="white" opacity="0.54"/><circle cx="98" cy="22" r="0.5" fill="white" opacity="0.27"/><circle cx="142" cy="67" r="1.6" fill="white" opacity="0.23"/><circle cx="82" cy="66" r="1.2" fill="white" opacity="0.70"/><circle cx="309" cy="87" r="1.0" fill="white" opacity="0.53"/><circle cx="176" cy="102" r="1.7" fill="white" opacity="0.26"/><circle cx="190" cy="59" r="1.4" fill="white" opacity="0.64"/><circle cx="386" cy="188" r="0.6" fill="white" opacity="0.65"/><circle cx="313" cy="230" r="1.8" fill="white" opacity="0.47"/><circle cx="133" cy="13" r="0.6" fill="white" opacity="0.49"/><circle cx="212" cy="208" r="1.0" fill="white" opacity="0.33"/><circle cx="132" cy="178" r="2.0" fill="white" opacity="0.32"/><circle cx="15" cy="100" r="0.5" fill="white" opacity="0.22"/><circle cx="20" cy="89" r="1.0" fill="white" opacity="0.30"/><circle cx="250" cy="179" r="1.4" fill="white" opacity="0.66"/><circle cx="191" cy="139" r="1.4" fill="white" opacity="0.53"/><rect width="400" height="240" fill="url(#v857394)"/></svg><div class="art-label">🎨 по погоде</div></div>
   <div class="card card-gh"></div>
   <div class="card card-moon"><h3>🌕 Луна</h3><span class="moon-icon">🌖</span><div class="moon-name">Убывающая луна</div></div>
   <div class="card card-ny"><h3>🎄 До НГ</h3><div class="ny-num">96</div><div class="ny-label">дней</div></div>
@@ -297,12 +364,48 @@ body.aurora::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:n
   <div class="card card-solar"><h3>🌞 Солнце прямо сейчас</h3><div class="space-grid"><a class="space-img" href="https://sdo.gsfc.nasa.gov/data/" target="_blank"><img src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_256_HMIIF.jpg" loading="lazy"><span class="space-label">Видимое</span></a><a class="space-img" href="https://sdo.gsfc.nasa.gov/data/" target="_blank"><img src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_256_0171.jpg" loading="lazy"><span class="space-label">Корона</span></a><a class="space-img" href="https://sdo.gsfc.nasa.gov/data/" target="_blank"><img src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_256_0304.jpg" loading="lazy"><span class="space-label">Атмосфера</span></a></div><div class="space-note">📸 NASA SDO · каждые 15 мин</div></div>
   <div class="card card-apod"><h3>🌌 Фото дня · NASA</h3><a class="apod-card" href="https://apod.nasa.gov/apod/image/2609/M31Before_Scherer_4298.jpg" target="_blank"><div><img class="apod-img" src="https://apod.nasa.gov/apod/image/2609/M31Before_Scherer_960.jpg" loading="lazy" onerror="this.style.display='none'"></div><div class="apod-title">Andromeda before Photoshop</div><div class="apod-date">2026-09-27</div><div class="apod-desc">What does the Andromeda galaxy really look like? The featured image shows how our Milky Way Galaxy&#x27;s closest major galactic neighbor really appears in a long exposure through Earth&#x27;s busy skies and with a digital camera that introduces normal imperfe...</div></a></div>
   <div class="card card-asteroids"><h3>☄️ Астероиды недели</h3><div class="ast-row"><span class="ast-icon" style="color:var(--accent2)">☄️</span><div class="ast-info"><div class="ast-name">2014 TU</div><div class="ast-meta">09-27 · 41 м · 56,092 км/ч</div></div></div><div class="ast-row"><span class="ast-icon" style="color:var(--accent2)">☄️</span><div class="ast-info"><div class="ast-name">2019 DJ1</div><div class="ast-meta">09-27 · 19 м · 44,519 км/ч</div></div></div><div class="ast-row"><span class="ast-icon" style="color:var(--accent2)">☄️</span><div class="ast-info"><div class="ast-name">2019 SH7</div><div class="ast-meta">09-27 · 95 м · 34,525 км/ч</div></div></div><div class="ast-row"><span class="ast-icon" style="color:var(--bad)">⚠️</span><div class="ast-info"><div class="ast-name">523934 1998 FF14</div><div class="ast-meta">09-28 · 325 м · 84,523 км/ч</div></div></div></div>
-  <div class="card card-launch"><h3>🚀 Запуск ракеты</h3><div class="launch-card"><div class="launch-icon">🚀</div><div class="launch-info"><div class="launch-name">Starship | Starlink Group 31-1 (Starship Flight 14)</div><div class="launch-provider">?</div><div class="launch-loc">?</div><div class="launch-countdown">⏱ 21ч 27м</div></div></div></div>
+  <div class="card card-launch"><h3>🚀 Запуск ракеты</h3><div class="launch-card"><div class="launch-icon">🚀</div><div class="launch-info"><div class="launch-name">Starship | Starlink Group 31-1 (Starship Flight 14)</div><div class="launch-provider">?</div><div class="launch-loc">?</div><div class="launch-countdown">⏱ 20ч 59м</div></div></div></div>
   <div class="card card-museum"><h3>🎨 Картина дня</h3><a class="art-card-museum" href="https://www.metmuseum.org/art/collection/search/462738" target="_blank"><img class="museum-img" src="https://images.metmuseum.org/CRDImages/md/web-large/sf99-35-582s1.jpg" loading="lazy" onerror="this.style.display='none'"><div class="museum-title">Rose Noble of Edward IV (1461-1483)</div><div class="museum-artist">Неизвестный, 1461–83</div><div class="museum-museum">🏛 The Met</div></a></div>
-  <div class="card card-cat"><h3>🐱 Кот дня</h3><a class="cat-card" href="https://s3.us-west-2.amazonaws.com/cdn2.thecatapi.com/images/cka.jpg" target="_blank"><img src="https://s3.us-west-2.amazonaws.com/cdn2.thecatapi.com/images/cka.jpg" loading="lazy"></a></div>
+  <div class="card card-cat"><h3>🐱 Кот дня</h3><a class="cat-card" href="https://s3.us-west-2.amazonaws.com/cdn2.thecatapi.com/images/MTU4NDY0MQ.jpg" target="_blank"><img src="https://s3.us-west-2.amazonaws.com/cdn2.thecatapi.com/images/MTU4NDY0MQ.jpg" loading="lazy"></a></div>
 
-  <div class="card card-planes"><h3>✈️ Самолёты над Нальчиком</h3><div class="plane-row"><span class="plane-icon">✈️</span><div class="plane-info"><div class="plane-name">AHY046</div><div class="plane-meta">10066 м · 400 км/ч · 142 км</div></div><span class="plane-country">United Kingdom</span></div></div>
-  <div class="card card-article"><h3>📖 Статья дня</h3><a class="article-card" href="https://ru.wikipedia.org/wiki/%D0%A1%D0%B5%D0%BD%D1%82-%D0%96%D0%B5%D0%BC-%D1%81%D1%8E%D1%80-%D0%9B%D1%83%D0%B0%D1%80" target="_blank"><img class="article-thumb" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/Sainte-Gemmes-sur-Loire_mairie.jpg/330px-Sainte-Gemmes-sur-Loire_mairie.jpg?utm_source=ru.wikipedia.org&utm_campaign=api&utm_content=thumbnail" loading="lazy" onerror="this.style.display='none'"><div class="article-title">Сент-Жем-сюр-Луар</div><div class="article-desc">Сент-Жем-сюр-Луар — коммуна на западе Франции, регион Пеи-де-ла-Луар, департамент Мен и Луара, округ Анже, кантон Анже-2. Пригород Анже, примыкает к нему с юга и юго-запада. Расположен между реками Мен и Луару в месте их соединения, в 3 км от автомагистрали А87....</div><div class="article-source">📖 Wikipedia RU</div></a></div>
+  <div class="card card-planes"><h3>✈️ Самолёты над Нальчиком</h3><div class="plane-row"><span class="plane-icon">✈️</span><div class="plane-info"><div class="plane-name">DLH760</div><div class="plane-meta">11270 м · 2185 км/ч · 77 км</div></div><span class="plane-country">Germany</span></div><div class="plane-row"><span class="plane-icon">✈️</span><div class="plane-info"><div class="plane-name">RWZ4332</div><div class="plane-meta">9754 м · 844 км/ч · 159 км</div></div><span class="plane-country">Russian Federation</span></div><div class="plane-row"><span class="plane-icon">✈️</span><div class="plane-info"><div class="plane-name">AZV440</div><div class="plane-meta">10668 м · 934 км/ч · 165 км</div></div><span class="plane-country">Russian Federation</span></div></div>
+  <div class="card card-article"><h3>📖 Статья дня</h3><a class="article-card" href="https://ru.wikipedia.org/wiki/%D0%A1%D0%BD%D0%B0%D0%B9%D0%B4%D0%B5%D1%80%2C_%D0%94%D0%B8%D0%BB%D0%B0%D0%BD_%D0%A0%D0%B0%D0%B9%D0%BB%D0%B8" target="_blank"><img class="article-thumb" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bd/Dylan_Riley_Snyder_at_the_Millie_Thrasher%27s_Sweet_16_Party_%28cropped%29.jpg/330px-Dylan_Riley_Snyder_at_the_Millie_Thrasher%27s_Sweet_16_Party_%28cropped%29.jpg?utm_source=ru.wikipedia.org&utm_campaign=api&utm_content=thumbnail" loading="lazy" onerror="this.style.display='none'"><div class="article-title">Снайдер, Дилан Райли</div><div class="article-desc">Дилан Райли Снайдер — американский актёр, певец, танцор и фотомодель. Наиболее известен как исполнитель роли Милтона Крапника в сериале «В ударе»....</div><div class="article-source">📖 Wikipedia RU</div></a></div>
+
+  <div class="card card-radio">
+    <h3>📻 Радио онлайн</h3>
+    <div class="radio-list">
+      <button class="radio-btn" onclick="playRadio('https://radio-record.hostingradio.ru/record128.mp3','Radio Record')">🎵 Radio Record</button>
+      <button class="radio-btn" onclick="playRadio('https://ep128.hostingradio.ru:8030/ep128','Европа Плюс')">🎵 Европа Плюс</button>
+      <button class="radio-btn" onclick="playRadio('https://retroserver.streamr.ru:8043/retro256.mp3','Ретро FM')">🎵 Ретро FM</button>
+      <button class="radio-btn" onclick="playRadio('https://dfm.hostingradio.ru/dfm96.aacp','DFM')">🎵 DFM</button>
+      <button class="radio-btn" onclick="playRadio('https://nashe1.hostingradio.ru/nashe-128.mp3','Наше Радио')">🎵 Наше Радио</button>
+    </div>
+    <div class="radio-player" id="radioPlayer" style="display:none">
+      <div class="radio-now" id="radioNow">—</div>
+      <audio id="radioAudio" controls style="width:100%;margin-top:8px"></audio>
+      <button class="dice-btn" style="width:100%;margin-top:6px" onclick="stopRadio()">⏹ Выключить</button>
+    </div>
+  </div>
+
+  <div class="card card-sleeptrack">
+    <h3>💤 Мой сон</h3>
+    <div class="sleeptrack-inputs">
+      <div class="sleeptrack-row"><label>Лёг в</label><input type="time" id="sleepIn" value="23:00" onchange="saveSleep()"></div>
+      <div class="sleeptrack-row"><label>Встал в</label><input type="time" id="sleepOut" value="07:00" onchange="saveSleep()"></div>
+    </div>
+    <div class="sleeptrack-result" id="sleepResult">—</div>
+    <div class="sleeptrack-week" id="sleepWeek"></div>
+  </div>
+
+  <div class="card card-backup">
+    <h3>💾 Бэкап данных</h3>
+    <p class="backup-note">Скачай все свои данные (привычки, задачи, заметки, даты) в один файл.</p>
+    <button class="dice-btn" style="width:100%;margin-bottom:8px" onclick="backupData()">📥 Скачать JSON</button>
+    <button class="dice-btn" style="width:100%;margin-bottom:8px" onclick="document.getElementById('restoreInput').click()">📤 Восстановить из файла</button>
+    <input type="file" id="restoreInput" accept=".json" style="display:none" onchange="restoreData(event)">
+    <button class="dice-btn" style="width:100%;color:var(--bad)" onclick="clearAllData()">🗑 Очистить всё</button>
+    <div class="backup-status" id="backupStatus"></div>
+  </div>
 
   <div class="card card-habits">
     <h3>🎯 Мои привычки</h3>
@@ -410,7 +513,7 @@ body.aurora::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:n
   </div>
 
   <div class="card card-sleep">
-    <h3>💤 Фаза сна</h3>
+    <h3>💤 Фаза сна (рекомендации)</h3>
     <div class="sleep-block">
       <div class="sleep-row"><span>Встать в</span> <b>06:00</b> → лечь в <b id="sleep-6">--:--</b></div>
       <div class="sleep-row"><span>Встать в</span> <b>07:00</b> → лечь в <b id="sleep-7">--:--</b></div>
@@ -438,14 +541,13 @@ body.aurora::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:n
 </div>
 
 <div class="footer">
-  Обновлено 14:47 МСК · обновляется каждый час
+  Обновлено 15:15 МСК · обновляется каждый час
 </div>
 
 </div>
 
 <script>
 const EXCH = {usd: 84.34, eur: 95.87, cny: 12.54};
-
 (function(){
   function tick(){
     const now = new Date();
@@ -474,17 +576,17 @@ const EXCH = {usd: 84.34, eur: 95.87, cny: 12.54};
   if (!['dark','light'].includes(saved)) saved = 'dark';
   document.documentElement.setAttribute('data-theme', saved);
   const btn = document.getElementById('themeBtn');
-  btn.textContent = saved === 'dark' ? '☀' : '🌙';
+  btn.textContent = saved === 'dark' ? '\u2600' : '\u{1F319}';
   btn.addEventListener('click', function(){
     const cur = document.documentElement.getAttribute('data-theme') || 'dark';
     const nxt = cur === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', nxt);
     localStorage.setItem('theme', nxt);
-    btn.textContent = nxt === 'dark' ? '☀' : '🌙';
+    btn.textContent = nxt === 'dark' ? '\u2600' : '\u{1F319}';
   });
   let soundOn = localStorage.getItem('clockSound') === 'on';
   const sBtn = document.getElementById('soundBtn');
-  sBtn.textContent = soundOn ? '🔊' : '🔇';
+  sBtn.textContent = soundOn ? '\u{1F50A}' : '\u{1F507}';
   let audioCtx = null;
   function beep(){
     if (!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){ return; } }
@@ -498,7 +600,7 @@ const EXCH = {usd: 84.34, eur: 95.87, cny: 12.54};
   sBtn.addEventListener('click', function(){
     soundOn = !soundOn;
     localStorage.setItem('clockSound', soundOn ? 'on' : 'off');
-    sBtn.textContent = soundOn ? '🔊' : '🔇';
+    sBtn.textContent = soundOn ? '\u{1F50A}' : '\u{1F507}';
   });
   setInterval(() => { if(soundOn) beep(); }, 1000);
   const kind = 'storm';
@@ -565,7 +667,7 @@ const EXCH = {usd: 84.34, eur: 95.87, cny: 12.54};
   window.rollDice = function(){
     const el = document.getElementById('diceResult'); if (!el) return;
     el.classList.add('rolling');
-    const faces = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+    const faces = ['\u2680','\u2681','\u2682','\u2683','\u2684','\u2685'];
     let n = 0;
     const iv = setInterval(() => { el.textContent = faces[Math.floor(Math.random() * 6)]; n++; if (n > 10) { clearInterval(iv); el.classList.remove('rolling'); } }, 60);
   };
@@ -573,10 +675,8 @@ const EXCH = {usd: 84.34, eur: 95.87, cny: 12.54};
     const el = document.getElementById('diceResult'); if (!el) return;
     el.classList.add('rolling');
     let n = 0;
-    const iv = setInterval(() => { el.textContent = Math.random() < 0.5 ? '🪙 Орёл' : '🪙 Решка'; n++; if (n > 8) { clearInterval(iv); el.classList.remove('rolling'); } }, 80);
+    const iv = setInterval(() => { el.textContent = Math.random() < 0.5 ? '\u{1FA99} Орёл' : '\u{1FA99} Решка'; n++; if (n > 8) { clearInterval(iv); el.classList.remove('rolling'); } }, 80);
   };
-
-  // ============ КАРТА МКС (LIVE) ============
   let issLat = 0, issLon = 0;
   function updateIssMap(){
     const dot = document.getElementById('issDot');
@@ -586,10 +686,7 @@ const EXCH = {usd: 84.34, eur: 95.87, cny: 12.54};
     const y = 90 - issLat;
     dot.setAttribute('cx', x);
     dot.setAttribute('cy', y);
-    if (dot2) {
-      dot2.setAttribute('cx', x);
-      dot2.setAttribute('cy', y);
-    }
+    if (dot2) { dot2.setAttribute('cx', x); dot2.setAttribute('cy', y); }
     const coordsEl = document.getElementById('issMapCoords');
     if (coordsEl) coordsEl.textContent = issLat.toFixed(1) + '°, ' + issLon.toFixed(1) + '°';
     const lat1 = 43.4981, lon1 = 43.6189;
@@ -606,18 +703,153 @@ const EXCH = {usd: 84.34, eur: 95.87, cny: 12.54};
       const r = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
       if (!r.ok) return;
       const d = await r.json();
-      issLat = d.latitude;
-      issLon = d.longitude;
+      issLat = d.latitude; issLon = d.longitude;
       updateIssMap();
     } catch(e){}
   }
   fetchIssLive();
   setInterval(fetchIssLive, 5000);
 
-  // ============ ПРИВЫЧКИ ============
-  function todayKey() { const d = new Date(); return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate(); }
-  function loadHabits() { try { return JSON.parse(localStorage.getItem('habits') || '[]'); } catch(e) { return []; } }
-  function saveHabits(h) { localStorage.setItem('habits', JSON.stringify(h)); }
+  window.playRadio = function(url, name){
+    const audio = document.getElementById('radioAudio');
+    const player = document.getElementById('radioPlayer');
+    const now = document.getElementById('radioNow');
+    if (!audio) return;
+    audio.src = url;
+    audio.play().catch(e => alert('Не удалось включить: ' + e.message));
+    if (player) player.style.display = 'block';
+    if (now) now.textContent = '\u{1F3B5} ' + name;
+  };
+  window.stopRadio = function(){
+    const audio = document.getElementById('radioAudio');
+    const player = document.getElementById('radioPlayer');
+    if (audio){ audio.pause(); audio.src = ''; }
+    if (player) player.style.display = 'none';
+  };
+
+  function loadSleep(){
+    try { return JSON.parse(localStorage.getItem('sleep') || '{}'); } catch(e){ return {}; }
+  }
+  function saveSleepData(d){ localStorage.setItem('sleep', JSON.stringify(d)); }
+  window.saveSleep = function(){
+    const inEl = document.getElementById('sleepIn');
+    const outEl = document.getElementById('sleepOut');
+    if (!inEl || !outEl) return;
+    const d = loadSleep();
+    const today = new Date();
+    const key = today.getFullYear() + '-' + (today.getMonth()+1) + '-' + today.getDate();
+    d[key] = { in: inEl.value, out: outEl.value };
+    saveSleepData(d);
+    renderSleep();
+  };
+  function calcHours(inT, outT){
+    if (!inT || !outT) return 0;
+    const p1 = inT.split(':').map(Number);
+    const p2 = outT.split(':').map(Number);
+    let mins = (p2[0] * 60 + p2[1]) - (p1[0] * 60 + p1[1]);
+    if (mins < 0) mins += 24 * 60;
+    return mins / 60;
+  }
+  function renderSleep(){
+    const d = loadSleep();
+    const today = new Date();
+    const key = today.getFullYear() + '-' + (today.getMonth()+1) + '-' + today.getDate();
+    const inEl = document.getElementById('sleepIn');
+    const outEl = document.getElementById('sleepOut');
+    if (d[key]){
+      if (inEl) inEl.value = d[key].in;
+      if (outEl) outEl.value = d[key].out;
+    }
+    const hrs = calcHours(inEl ? inEl.value : '23:00', outEl ? outEl.value : '07:00');
+    const resEl = document.getElementById('sleepResult');
+    if (resEl){
+      const h = Math.floor(hrs);
+      const m = Math.round((hrs - h) * 60);
+      const color = hrs >= 7 ? 'var(--good)' : (hrs >= 6 ? 'var(--warn)' : 'var(--bad)');
+      resEl.innerHTML = '<span style="color:' + color + '">' + h + 'ч ' + m + 'м</span>';
+    }
+    const weekEl = document.getElementById('sleepWeek');
+    if (weekEl){
+      const days = [];
+      for (let i = 6; i >= 0; i--){
+        const dt = new Date(); dt.setDate(dt.getDate() - i);
+        const k = dt.getFullYear() + '-' + (dt.getMonth()+1) + '-' + dt.getDate();
+        const entry = d[k];
+        const h = entry ? calcHours(entry.in, entry.out) : 0;
+        days.push({ key: k, hours: h });
+      }
+      const maxH = 10;
+      const bars = days.map(x => {
+        const pct = Math.min(100, (x.hours / maxH) * 100);
+        const title = x.hours > 0 ? x.hours.toFixed(1) + 'ч' : '—';
+        return '<div class="sleeptrack-bar" style="height:' + pct + '%" title="' + title + '"></div>';
+      }).join('');
+      weekEl.innerHTML = bars;
+    }
+  }
+  renderSleep();
+
+  const BACKUP_KEYS = ['habits', 'todo', 'notes', 'dates', 'theme', 'clockSound', 'sleep'];
+  window.backupData = function(){
+    const data = { version: 4, exported: new Date().toISOString(), data: {} };
+    BACKUP_KEYS.forEach(k => {
+      const v = localStorage.getItem(k);
+      if (v !== null) data.data[k] = v;
+    });
+    for (let i = 0; i < localStorage.length; i++){
+      const k = localStorage.key(i);
+      if (k && (k.startsWith('mood-') || k.startsWith('water-') || k.startsWith('pomo-'))){
+        data.data[k] = localStorage.getItem(k);
+      }
+    }
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'dashboard-backup-' + new Date().toISOString().slice(0,10) + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    const st = document.getElementById('backupStatus');
+    if (st){ st.textContent = '✓ Скачано'; setTimeout(() => st.textContent = '', 3000); }
+  };
+  window.restoreData = function(ev){
+    const file = ev.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const parsed = JSON.parse(e.target.result);
+        if (!parsed.data) { throw new Error('Неверный формат'); }
+        let restored = 0;
+        Object.entries(parsed.data).forEach(([k, v]) => {
+          localStorage.setItem(k, v);
+          restored++;
+        });
+        const st = document.getElementById('backupStatus');
+        if (st){ st.textContent = '✓ Восстановлено: ' + restored + ' ключей. Обнови страницу.'; setTimeout(() => location.reload(), 1500); }
+      } catch (err) {
+        const st = document.getElementById('backupStatus');
+        if (st){ st.textContent = '❌ Ошибка: ' + err.message; }
+      }
+    };
+    reader.readAsText(file);
+    ev.target.value = '';
+  };
+  window.clearAllData = function(){
+    if (!confirm('Точно удалить ВСЕ данные? Это необратимо!')) return;
+    const toDelete = [];
+    for (let i = 0; i < localStorage.length; i++){
+      const k = localStorage.key(i);
+      if (k && (k.startsWith('mood-') || k.startsWith('water-') || k.startsWith('pomo-'))) toDelete.push(k);
+    }
+    BACKUP_KEYS.forEach(k => { if (localStorage.getItem(k) !== null) toDelete.push(k); });
+    toDelete.forEach(k => localStorage.removeItem(k));
+    location.reload();
+  };
+
+  function todayKey(){ const d = new Date(); return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate(); }
+  function loadHabits(){ try { return JSON.parse(localStorage.getItem('habits') || '[]'); } catch(e) { return []; } }
+  function saveHabits(h){ localStorage.setItem('habits', JSON.stringify(h)); }
   window.addHabit = function(){
     const inp = document.getElementById('habitInput');
     const name = inp.value.trim(); if (!name) return;
@@ -647,15 +879,14 @@ const EXCH = {usd: 84.34, eur: 95.87, cny: 12.54};
       return '<div class="habit-row">' +
         '<div class="habit-check ' + (done ? 'done' : '') + '" onclick="toggleHabit(' + i + ')">' + (done ? '✓' : '') + '</div>' +
         '<span class="habit-name ' + (done ? 'done' : '') + '" onclick="toggleHabit(' + i + ')">' + x.name.replace(/</g,'&lt;') + '</span>' +
-        (streak > 1 ? '<span class="habit-streak">🔥' + streak + '</span>' : '') +
+        (streak > 1 ? '<span class="habit-streak">\u{1F525}' + streak + '</span>' : '') +
         '<button class="habit-del" onclick="delHabit(' + i + ')">×</button></div>';
     }).join('');
   }
   renderHabits();
 
-  // ============ TODO ============
-  function loadTodo() { try { return JSON.parse(localStorage.getItem('todo') || '[]'); } catch(e) { return []; } }
-  function saveTodo(t) { localStorage.setItem('todo', JSON.stringify(t)); }
+  function loadTodo(){ try { return JSON.parse(localStorage.getItem('todo') || '[]'); } catch(e) { return []; } }
+  function saveTodo(t){ localStorage.setItem('todo', JSON.stringify(t)); }
   window.addTodo = function(){
     const inp = document.getElementById('todoInput');
     const txt = inp.value.trim(); if (!txt) return;
@@ -667,7 +898,7 @@ const EXCH = {usd: 84.34, eur: 95.87, cny: 12.54};
   function renderTodo(){
     const el = document.getElementById('todoList'); if (!el) return;
     const t = loadTodo();
-    if (!t.length) { el.innerHTML = '<div class="empty">Все задачи сделаны ✨</div>'; return; }
+    if (!t.length) { el.innerHTML = '<div class="empty">Все задачи сделаны \u2728</div>'; return; }
     el.innerHTML = t.map((x, i) =>
       '<div class="todo-row">' +
       '<div class="todo-check ' + (x.done ? 'done' : '') + '" onclick="toggleTodo(' + i + ')">' + (x.done ? '✓' : '') + '</div>' +
@@ -677,7 +908,6 @@ const EXCH = {usd: 84.34, eur: 95.87, cny: 12.54};
   }
   renderTodo();
 
-  // ============ ЗАМЕТКИ ============
   const notesArea = document.getElementById('notesArea');
   const notesStatus = document.getElementById('notesStatus');
   if (notesArea) {
@@ -693,7 +923,6 @@ const EXCH = {usd: 84.34, eur: 95.87, cny: 12.54};
     });
   }
 
-  // ============ ПОМОДОРО ============
   let pomoSeconds = 25 * 60;
   let pomoRunning = false;
   let pomoInterval = null;
@@ -723,7 +952,7 @@ const EXCH = {usd: 84.34, eur: 95.87, cny: 12.54};
           if (pomoStartBtn) pomoStartBtn.textContent = '▶ Старт';
           if (pomoMode === 'work') {
             pomoCount++; localStorage.setItem(pomoCountKey, pomoCount);
-            if (pomoCountEl) pomoCountEl.textContent = '🍅 сегодня: ' + pomoCount;
+            if (pomoCountEl) pomoCountEl.textContent = '\u{1F345} сегодня: ' + pomoCount;
             pomoMode = 'break'; pomoSeconds = 5 * 60;
           } else {
             pomoMode = 'work'; pomoSeconds = 25 * 60;
@@ -741,15 +970,14 @@ const EXCH = {usd: 84.34, eur: 95.87, cny: 12.54};
     pomoUpdate();
   };
   pomoUpdate();
-  if (pomoCountEl) pomoCountEl.textContent = '🍅 сегодня: ' + pomoCount;
+  if (pomoCountEl) pomoCountEl.textContent = '\u{1F345} сегодня: ' + pomoCount;
 
-  // ============ НАСТРОЕНИЕ ============
   const moodKey = 'mood-' + todayKey();
   function renderMood(){
     const cur = localStorage.getItem(moodKey);
     const st = document.getElementById('moodStatus');
     if (st) {
-      const map = {'good':'😄 Отлично','ok':'😐 Норм','bad':'😞 Плохо'};
+      const map = {'good':'\u{1F604} Отлично','ok':'\u{1F610} Норм','bad':'\u{1F61E} Плохо'};
       st.textContent = 'Сегодня: ' + (cur ? map[cur] : '—');
     }
     document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
@@ -761,13 +989,12 @@ const EXCH = {usd: 84.34, eur: 95.87, cny: 12.54};
   window.setMood = function(m){ localStorage.setItem(moodKey, m); renderMood(); };
   renderMood();
 
-  // ============ ВОДА ============
   const waterKey = 'water-' + todayKey();
   function renderWater(){
     const v = parseInt(localStorage.getItem(waterKey) || '0');
     const el = document.getElementById('waterGlass');
     if (el) {
-      const cups = '💧'.repeat(Math.min(v, 8));
+      const cups = '\u{1F4A7}'.repeat(Math.min(v, 8));
       el.textContent = v + ' / 8 ' + cups;
     }
   }
@@ -778,7 +1005,6 @@ const EXCH = {usd: 84.34, eur: 95.87, cny: 12.54};
   window.resetWater = function(){ localStorage.setItem(waterKey, '0'); renderWater(); };
   renderWater();
 
-  // ============ КОНВЕРТЕРЫ ============
   window.convTemp = function(){
     const c = parseFloat(document.getElementById('convC').value);
     document.getElementById('convF').textContent = isNaN(c) ? '°F' : (c * 9 / 5 + 32).toFixed(1) + '°F';
@@ -798,7 +1024,6 @@ const EXCH = {usd: 84.34, eur: 95.87, cny: 12.54};
     el.textContent = '$' + (r / EXCH.usd).toFixed(2) + ' / €' + (r / EXCH.eur).toFixed(2);
   };
 
-  // ============ ПАРОЛЬ / QR ============
   window.genPwd = function(){
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%^&*';
     let s = '';
@@ -814,9 +1039,8 @@ const EXCH = {usd: 84.34, eur: 95.87, cny: 12.54};
     new QRCode(box, {text: location.href, width: 180, height: 180, colorDark: '#000', colorLight: '#fff'});
   };
 
-  // ============ СЧЁТЧИКИ ДАТ ============
-  function loadDates() { try { return JSON.parse(localStorage.getItem('dates') || '[]'); } catch(e) { return []; } }
-  function saveDates(d) { localStorage.setItem('dates', JSON.stringify(d)); }
+  function loadDates(){ try { return JSON.parse(localStorage.getItem('dates') || '[]'); } catch(e) { return []; } }
+  function saveDates(d){ localStorage.setItem('dates', JSON.stringify(d)); }
   window.addDateCounter = function(){
     const inp = document.getElementById('dateInput');
     const lbl = document.getElementById('dateLabel');
@@ -834,8 +1058,8 @@ const EXCH = {usd: 84.34, eur: 95.87, cny: 12.54};
     el.innerHTML = d.map((x, i) => {
       const target = new Date(x.date); target.setHours(0,0,0,0);
       const days = Math.round((target - now) / 86400000);
-      const label = days > 0 ? 'через ' + days + ' дн.' : (days < 0 ? Math.abs(days) + ' дн. назад' : 'сегодня 🎉');
-      const emoji = days === 0 ? '🎉' : (days > 0 ? '⏳' : '📅');
+      const label = days > 0 ? 'через ' + days + ' дн.' : (days < 0 ? Math.abs(days) + ' дн. назад' : 'сегодня \u{1F389}');
+      const emoji = days === 0 ? '\u{1F389}' : (days > 0 ? '\u23F3' : '\u{1F4C5}');
       return '<div class="date-row">' +
         '<span class="date-label-txt">' + emoji + ' ' + x.label.replace(/</g,'&lt;') + '</span>' +
         '<span class="date-days">' + label + '</span>' +
@@ -844,7 +1068,6 @@ const EXCH = {usd: 84.34, eur: 95.87, cny: 12.54};
   }
   renderDates();
 })();
-
 </script>
 
 </body>
