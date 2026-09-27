@@ -83,10 +83,22 @@ body.aurora::after{
 .card-history{grid-column:span 6}
 .card-quote{grid-column:span 12}
 
+.card-solar{grid-column:span 6}
+.card-apod{grid-column:span 6}
+.card-asteroids{grid-column:span 4}
+.card-launch{grid-column:span 4}
+.card-museum{grid-column:span 4}
+.card-cat{grid-column:span 3;padding:0;overflow:hidden}
+.card-sleep{grid-column:span 3}
+.card-dice{grid-column:span 3;text-align:center}
+.card-fact{grid-column:span 3}
+
 @media(max-width:1000px){
   .card-clock,.card-weather,.card-iss,.card-kp,.card-aq,.card-uv{grid-column:span 6}
   .card-currency,.card-crypto,.card-calendar,.card-art,.card-gh,.card-moon,.card-ny,.card-track{grid-column:span 3}
   .card-news,.card-eq,.card-history,.card-quote{grid-column:span 6}
+  .card-solar,.card-apod,.card-asteroids,.card-launch,.card-museum{grid-column:span 6}
+  .card-cat,.card-sleep,.card-dice,.card-fact{grid-column:span 3}
 }
 
 .clock{font-size:clamp(56px,10vw,88px);font-weight:200;letter-spacing:-0.05em;line-height:0.95;font-variant-numeric:tabular-nums;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
@@ -209,6 +221,61 @@ body.aurora::after{
 .holiday{grid-column:span 12;text-align:center;padding:12px 20px;background:linear-gradient(135deg,rgba(255,193,7,0.15),rgba(255,87,34,0.12));border:1px solid rgba(255,193,7,0.3);border-radius:16px;font-size:15px;font-weight:500;animation:holidayPulse 3s ease-in-out infinite}
 @keyframes holidayPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,193,7,0.3)}50%{box-shadow:0 0 30px 4px rgba(255,193,7,0.18)}}
 
+/* ===== Новые блоки ===== */
+.space-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.space-img{position:relative;border-radius:10px;overflow:hidden;text-decoration:none;display:block;background:#000}
+.space-img img{width:100%;height:auto;display:block;transition:transform .3s}
+.space-img:hover img{transform:scale(1.05)}
+.space-label{position:absolute;bottom:4px;left:6px;font-size:9px;color:#fff;background:rgba(0,0,0,0.6);padding:2px 6px;border-radius:6px;font-weight:500}
+.space-note{text-align:center;font-size:10px;color:var(--muted)}
+
+.apod-card{display:block;text-decoration:none;color:var(--text)}
+.apod-img{width:100%;height:200px;object-fit:cover;border-radius:12px;margin-bottom:10px;background:var(--panel2)}
+.apod-title{font-size:14px;font-weight:500;margin-bottom:4px;line-height:1.3}
+.apod-card:hover .apod-title{color:var(--accent)}
+.apod-date{font-size:10px;color:var(--muted);margin-bottom:6px;letter-spacing:0.4px}
+.apod-desc{font-size:11px;color:var(--muted);line-height:1.45;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
+
+.ast-row{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.ast-row:last-child{border-bottom:none}
+.ast-icon{font-size:20px;line-height:1}
+.ast-info{flex:1;min-width:0}
+.ast-name{font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ast-meta{font-size:10px;color:var(--muted);margin-top:2px}
+
+.launch-card{display:flex;gap:12px;align-items:flex-start}
+.launch-icon{font-size:36px;line-height:1;filter:drop-shadow(0 4px 12px rgba(96,165,250,0.4))}
+.launch-info{flex:1;min-width:0}
+.launch-name{font-size:13px;font-weight:500;line-height:1.3;margin-bottom:4px}
+.launch-provider{font-size:11px;color:var(--accent);margin-bottom:2px}
+.launch-loc{font-size:10px;color:var(--muted);margin-bottom:6px}
+.launch-countdown{font-size:14px;font-weight:600;color:var(--accent2);font-variant-numeric:tabular-nums}
+
+.art-card-museum{display:block;text-decoration:none;color:var(--text)}
+.museum-img{width:100%;height:200px;object-fit:cover;border-radius:12px;margin-bottom:10px;background:var(--panel2)}
+.museum-title{font-size:13px;font-weight:500;margin-bottom:2px}
+.art-card-museum:hover .museum-title{color:var(--accent)}
+.museum-artist{font-size:11px;color:var(--muted)}
+.museum-museum{font-size:10px;color:var(--muted);margin-top:6px;opacity:0.7}
+
+.cat-card{display:block}
+.cat-card img{width:100%;height:100%;min-height:180px;object-fit:cover;display:block}
+
+.sleep-block{font-size:12px}
+.sleep-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);color:var(--muted);flex-wrap:wrap;gap:4px}
+.sleep-row:last-of-type{border-bottom:none}
+.sleep-row b{color:var(--text);font-variant-numeric:tabular-nums;font-weight:500}
+.sleep-note{font-size:10px;color:var(--muted);margin-top:10px;text-align:center;opacity:0.7}
+
+.dice-result{font-size:60px;line-height:1;margin:10px 0;min-height:70px;display:flex;align-items:center;justify-content:center;transition:transform .3s}
+.dice-result.rolling{animation:shake .5s}
+@keyframes shake{0%,100%{transform:rotate(0)}25%{transform:rotate(-15deg)}75%{transform:rotate(15deg)}}
+.dice-buttons{display:flex;gap:8px;justify-content:center;margin-top:10px}
+.dice-btn{background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:8px 14px;border-radius:10px;cursor:pointer;font-size:12px;font-family:inherit;transition:border-color .15s}
+.dice-btn:hover{border-color:var(--accent)}
+
+.fact-text{font-size:13px;line-height:1.5;color:var(--text);font-style:italic}
+
 .footer{text-align:center;font-size:11px;color:var(--muted);padding:24px 0 8px}
 
 .splash{position:fixed;inset:0;background:var(--bg);z-index:1000;display:flex;align-items:center;justify-content:center;font-size:52px;animation:splashOut 0.9s ease-out 1s forwards;pointer-events:none}
@@ -259,12 +326,12 @@ body.aurora::after{
 
   <div class="card card-iss">
     <h3>🛰 МКС прямо сейчас</h3>
-    <div class="iss-hero"><div class="iss-icon">🛰</div><div><div class="iss-dist">5514 <span class="iss-dist-unit">км от тебя</span></div><div class="iss-sub">высота 417 км · 27597 км/ч</div></div></div><div class="iss-meta"><span>📍 21.07°, 97.31°</span><span>👁 eclipsed</span></div>
+    <div class="iss-hero"><div class="iss-icon">🛰</div><div><div class="iss-dist">6078 <span class="iss-dist-unit">км от тебя</span></div><div class="iss-sub">высота 417 км · 27597 км/ч</div></div></div><div class="iss-meta"><span>📍 17.0°, 100.68°</span><span>👁 eclipsed</span></div>
   </div>
 
   <div class="card card-kp">
     <h3>🌌 Магнитное поле</h3>
-    <div class="empty">—</div>
+    <div class="kp-hero"><div class="kp-value" style="color:#4ade80">0.3</div><div class="kp-label">Kp-индекс</div></div><div class="kp-level" style="color:#4ade80">Спокойно</div><div class="kp-bars"><div class="kp-bar" style="height:14%" title="Kp=1.33"></div><div class="kp-bar" style="height:14%" title="Kp=1.33"></div><div class="kp-bar" style="height:14%" title="Kp=1.33"></div><div class="kp-bar" style="height:11%" title="Kp=1.0"></div><div class="kp-bar" style="height:11%" title="Kp=1.0"></div><div class="kp-bar" style="height:3%" title="Kp=0.33"></div></div><div class="kp-axis"><span>6ч назад</span><span>сейчас</span></div>
   </div>
 
   <div class="card card-aq">
@@ -284,7 +351,7 @@ body.aurora::after{
 
   <div class="card card-crypto">
     <h3>💰 Крипта</h3>
-    <div class="cur-row"><span class="cur-flag">₿</span><span class="cur-code">BTC</span><span class="cur-val">$84,908</span><span class="cur-chg" style="color:var(--good)">▲ 1.2%</span></div><div class="cur-row"><span class="cur-flag">Ξ</span><span class="cur-code">ETH</span><span class="cur-val">$2,706</span><span class="cur-chg" style="color:var(--good)">▲ 0.8%</span></div><div class="cur-row"><span class="cur-flag">💎</span><span class="cur-code">TON</span><span class="cur-val">$1.59</span><span class="cur-chg" style="color:var(--good)">▲ 7.6%</span></div>
+    <div class="cur-row"><span class="cur-flag">₿</span><span class="cur-code">BTC</span><span class="cur-val">$84,951</span><span class="cur-chg" style="color:var(--good)">▲ 1.2%</span></div><div class="cur-row"><span class="cur-flag">Ξ</span><span class="cur-code">ETH</span><span class="cur-val">$2,707</span><span class="cur-chg" style="color:var(--good)">▲ 0.8%</span></div><div class="cur-row"><span class="cur-flag">💎</span><span class="cur-code">TON</span><span class="cur-val">$1.59</span><span class="cur-chg" style="color:var(--good)">▲ 8.0%</span></div>
   </div>
 
   <div class="card card-news">
@@ -293,7 +360,7 @@ body.aurora::after{
         <a class="news-card" href="https://lenta.ru/news/2026/09/27/birrell-vyigrala-pervyy-titul-wta-v-kariere/" target="_blank" rel="noopener">
           <div class="news-head">
             <span class="news-source">Lenta</span>
-            <span class="news-ago">1 мин</span>
+            <span class="news-ago">2 мин</span>
           </div>
           <div class="news-title">Биррелл выиграла первый титул WTA в карьере</div>
           
@@ -301,7 +368,7 @@ body.aurora::after{
         <a class="news-card" href="https://www.rbc.ru/politics/27/09/2026/6ab90ea675d4be385637e2c6" target="_blank" rel="noopener">
           <div class="news-head">
             <span class="news-source">RBC</span>
-            <span class="news-ago">2 мин</span>
+            <span class="news-ago">3 мин</span>
           </div>
           <div class="news-title">WSJ узнала о новой тактике КНДР для создания нагрузки на западную ПВО</div>
           <div class="news-desc">КНДР впервые провела учения с одновременным применением ударных беспилотников, ракет, реактивных снарядов и дальнобойной артилл...</div>
@@ -309,7 +376,7 @@ body.aurora::after{
         <a class="news-card" href="https://lenta.ru/news/2026/09/27/polchischa-kleschey-atakovali-zhiteley-rossiyskogo-regiona/" target="_blank" rel="noopener">
           <div class="news-head">
             <span class="news-source">Lenta</span>
-            <span class="news-ago">2 мин</span>
+            <span class="news-ago">3 мин</span>
           </div>
           <div class="news-title">Полчища клещей атаковали жителей российского региона</div>
           
@@ -317,7 +384,7 @@ body.aurora::after{
         <a class="news-card" href="https://lenta.ru/news/2026/09/27/chemveno-vyigral-moskovskiy-marafon/" target="_blank" rel="noopener">
           <div class="news-head">
             <span class="news-source">Lenta</span>
-            <span class="news-ago">2 мин</span>
+            <span class="news-ago">4 мин</span>
           </div>
           <div class="news-title">Чемвено выиграл Московский марафон</div>
           
@@ -325,7 +392,7 @@ body.aurora::after{
         <a class="news-card" href="https://lenta.ru/news/2026/09/27/v-gosdume-odnoy-frazoy-otsenili-trebovaniya-ukrainy-otstranit-kolobkova-ot-raboty-v-fide/" target="_blank" rel="noopener">
           <div class="news-head">
             <span class="news-source">Lenta</span>
-            <span class="news-ago">3 мин</span>
+            <span class="news-ago">4 мин</span>
           </div>
           <div class="news-title">В Госдуме одной фразой оценили требования Украины отстранить Колобкова от работы в FIDE</div>
           
@@ -333,7 +400,7 @@ body.aurora::after{
         <a class="news-card" href="https://www.rbc.ru/sport/27/09/2026/6ab91df39a7947cd189b1481" target="_blank" rel="noopener">
           <div class="news-head">
             <span class="news-source">RBC</span>
-            <span class="news-ago">4 мин</span>
+            <span class="news-ago">5 мин</span>
           </div>
           <div class="news-title">Травма помешала эфиопской бегунье побить мировой рекорд в марафоне</div>
           <div class="news-desc">Тигст Ассефа большую часть дистанции Берлинского марафона бежала на мировой рекорд, но в концовке сбавила скорость из-за пробле...</div>
@@ -341,7 +408,7 @@ body.aurora::after{
         <a class="news-card" href="https://lenta.ru/news/2026/09/27/raskryty-podrobnosti-uchastiya-lavrova-v-generalnoy-assamblei-oon/" target="_blank" rel="noopener">
           <div class="news-head">
             <span class="news-source">Lenta</span>
-            <span class="news-ago">4 мин</span>
+            <span class="news-ago">6 мин</span>
           </div>
           <div class="news-title">Раскрыты подробности участия Лаврова в Генеральной Ассамблее ООН</div>
           
@@ -349,7 +416,7 @@ body.aurora::after{
         <a class="news-card" href="https://www.rbc.ru/business/27/09/2026/6ab90eea3cb69735b17f1aa3" target="_blank" rel="noopener">
           <div class="news-head">
             <span class="news-source">RBC</span>
-            <span class="news-ago">7 мин</span>
+            <span class="news-ago">8 мин</span>
           </div>
           <div class="news-title">Швейцария сообщила о дипломатической помощи Nestle по активам в России</div>
           <div class="news-desc">Швейцарские власти рассказали NZZ о помощи Nestlе по дипломатическим каналам с целью добиться отмены временного управления его ...</div>
@@ -357,7 +424,7 @@ body.aurora::after{
         <a class="news-card" href="https://tass.ru/proisshestviya/28156287" target="_blank" rel="noopener">
           <div class="news-head">
             <span class="news-source">TASS</span>
-            <span class="news-ago">8 мин</span>
+            <span class="news-ago">10 мин</span>
           </div>
           <div class="news-title">Военных во время учений на Каспии не обеспечили спасательными жилетами</div>
           <div class="news-desc">Президент Казахстана Касым-Жомарт Токаев добавил, что гибель военнослужащих в мирное время стала следствием &quot;преступного непроф...</div>
@@ -365,7 +432,7 @@ body.aurora::after{
         <a class="news-card" href="https://tass.ru/proisshestviya/28156285" target="_blank" rel="noopener">
           <div class="news-head">
             <span class="news-source">TASS</span>
-            <span class="news-ago">11 мин</span>
+            <span class="news-ago">12 мин</span>
           </div>
           <div class="news-title">В Тверской области при пожаре в жилом доме погибли три человека</div>
           <div class="news-desc">Пожар тушили 13 человек личного состава и 5 единиц техники</div>
@@ -373,7 +440,7 @@ body.aurora::after{
         <a class="news-card" href="https://www.rbc.ru/rbcfreenews/6ab91aa7ece575df98386a57" target="_blank" rel="noopener">
           <div class="news-head">
             <span class="news-source">RBC</span>
-            <span class="news-ago">15 мин</span>
+            <span class="news-ago">17 мин</span>
           </div>
           <div class="news-title">В Черногории арестовали двух россиян по подозрению в контрабанде</div>
           <div class="news-desc">Суд в черногорском Которе заключил под стражу на срок до 30 дней граждан России Александра Круглянского и Александру Круглянску...</div>
@@ -381,7 +448,7 @@ body.aurora::after{
         <a class="news-card" href="https://tass.ru/proisshestviya/28156281" target="_blank" rel="noopener">
           <div class="news-head">
             <span class="news-source">TASS</span>
-            <span class="news-ago">22 мин</span>
+            <span class="news-ago">24 мин</span>
           </div>
           <div class="news-title">В Британии около авиабазы США задержали подозреваемых в подготовке теракта</div>
           <div class="news-desc">Следствие пытается установить, связаны ли пятеро задержанных мужчин с Ираном, пишет The Times</div>
@@ -435,10 +502,90 @@ body.aurora::after{
     <div class="quote-author">Пауло Коэльо</div>
   </div>
 
+  <div class="card card-solar">
+    <h3>🌞 Солнце прямо сейчас</h3>
+    
+    <div class="space-grid">
+      <a class="space-img" href="https://sdo.gsfc.nasa.gov/data/" target="_blank" rel="noopener">
+        <img src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_256_HMIIF.jpg" alt="Солнце видимое" loading="lazy" onerror="this.parentElement.style.display='none'">
+        <span class="space-label">Видимое</span>
+      </a>
+      <a class="space-img" href="https://sdo.gsfc.nasa.gov/data/" target="_blank" rel="noopener">
+        <img src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_256_0171.jpg" alt="Корона" loading="lazy" onerror="this.parentElement.style.display='none'">
+        <span class="space-label">Корона 171Å</span>
+      </a>
+      <a class="space-img" href="https://sdo.gsfc.nasa.gov/data/" target="_blank" rel="noopener">
+        <img src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_256_0304.jpg" alt="Атмосфера" loading="lazy" onerror="this.parentElement.style.display='none'">
+        <span class="space-label">Атмосфера 304Å</span>
+      </a>
+    </div>
+    <div class="space-note">📸 NASA SDO · обновляется каждые 15 мин</div>
+    
+  </div>
+
+  <div class="card card-apod">
+    <h3>🌌 Фото дня · NASA</h3>
+    
+    <a class="apod-card" href="https://apod.nasa.gov/apod/image/2609/M31Before_Scherer_4298.jpg" target="_blank" rel="noopener">
+      <img class="apod-img" src="https://apod.nasa.gov/apod/image/2609/M31Before_Scherer_960.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+      <div class="apod-info">
+        <div class="apod-title">Andromeda before Photoshop</div>
+        <div class="apod-date">2026-09-27</div>
+        <div class="apod-desc">What does the Andromeda galaxy really look like? The featured image shows how our Milky Way Galaxy&#x27;s closest major galactic neighbor really appears in a long exposure through Earth&#x27;s busy skies and with a digital camera that introduces normal imperfe...</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="card card-asteroids">
+    <h3>☄️ Астероиды недели</h3>
+    <div class="ast-row"><span class="ast-icon" style="color:var(--accent2)">☄️</span><div class="ast-info"><div class="ast-name">2014 TU</div><div class="ast-meta">09-27 · 41 м · 56,092 км/ч · 40,650,768 км</div></div></div><div class="ast-row"><span class="ast-icon" style="color:var(--accent2)">☄️</span><div class="ast-info"><div class="ast-name">2019 DJ1</div><div class="ast-meta">09-27 · 19 м · 44,519 км/ч · 42,105,243 км</div></div></div><div class="ast-row"><span class="ast-icon" style="color:var(--accent2)">☄️</span><div class="ast-info"><div class="ast-name">2019 SH7</div><div class="ast-meta">09-27 · 95 м · 34,525 км/ч · 32,446,693 км</div></div></div><div class="ast-row"><span class="ast-icon" style="color:var(--bad)">⚠️</span><div class="ast-info"><div class="ast-name">523934 1998 FF14</div><div class="ast-meta">09-28 · 325 м · 84,523 км/ч · 15,393,501 км</div></div></div>
+  </div>
+
+  <div class="card card-launch">
+    <h3>🚀 Ближайший запуск</h3>
+    <div class="empty">—</div>
+  </div>
+
+  <div class="card card-museum">
+    <h3>🎨 Картина дня</h3>
+    <a class="art-card-museum" href="https://www.metmuseum.org/art/collection/search/462738" target="_blank" rel="noopener"><img class="museum-img" src="https://images.metmuseum.org/CRDImages/md/web-large/sf99-35-582s1.jpg" alt="" loading="lazy" onerror="this.style.display='none'"><div class="museum-info"><div class="museum-title">Rose Noble of Edward IV (1461-1483)</div><div class="museum-artist">Неизвестный, 1461–83</div><div class="museum-museum">🏛 The Met</div></div></a>
+  </div>
+
+  <div class="card card-cat">
+    <h3>🐱 Кот дня</h3>
+    <a class="cat-card" href="https://s3.us-west-2.amazonaws.com/cdn2.thecatapi.com/images/a8b.jpg" target="_blank" rel="noopener"><img src="https://s3.us-west-2.amazonaws.com/cdn2.thecatapi.com/images/a8b.jpg" alt="Кот" loading="lazy" onerror="this.parentElement.style.display='none'"></a>
+  </div>
+
+  <div class="card card-sleep">
+    <h3>💤 Фаза сна</h3>
+    <div class="sleep-block">
+      <div class="sleep-row"><span>Встать в</span> <b>06:00</b> → лечь в <b id="sleep-6">--:--</b></div>
+      <div class="sleep-row"><span>Встать в</span> <b>07:00</b> → лечь в <b id="sleep-7">--:--</b></div>
+      <div class="sleep-row"><span>Встать в</span> <b>08:00</b> → лечь в <b id="sleep-8">--:--</b></div>
+      <div class="sleep-note">💡 90-минутные циклы сна</div>
+    </div>
+  </div>
+
+  <div class="card card-dice">
+    <h3>🎲 Кубик / Монетка</h3>
+    <div class="dice-wrap">
+      <div class="dice-result" id="diceResult">🎲</div>
+      <div class="dice-buttons">
+        <button class="dice-btn" onclick="rollDice()">Кубик</button>
+        <button class="dice-btn" onclick="flipCoin()">Монетка</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-fact">
+    <h3>🧠 Факт дня</h3>
+    <div class="fact-text">В человеческом теле 37 триллионов клеток и 30 триллионов бактерий — почти пополам.</div>
+  </div>
+
 </div>
 
 <div class="footer">
-  Обновлено 14:07 МСК · обновляется каждый час
+  Обновлено 14:09 МСК · обновляется каждый час
 </div>
 
 </div>
@@ -584,6 +731,57 @@ body.aurora::after{
     }
     draw();
   }
+
+  // ===== Фаза сна =====
+  function sleepCalc(){
+    const now = new Date();
+    const msk = new Date(now.toLocaleString('en-US', {timeZone:'Europe/Moscow'}));
+    [6, 7, 8].forEach(target => {
+      const wake = new Date(msk);
+      wake.setHours(target, 0, 0, 0);
+      if (wake <= msk) wake.setDate(wake.getDate() + 1);
+      const cycles = 5;
+      const sleepMs = wake.getTime() - (15 * 60 * 1000) - (cycles * 90 * 60 * 1000);
+      const s = new Date(sleepMs);
+      const hh = String(s.getHours()).padStart(2, '0');
+      const mm = String(s.getMinutes()).padStart(2, '0');
+      const el = document.getElementById('sleep-' + target);
+      if (el) el.textContent = hh + ':' + mm;
+    });
+  }
+  sleepCalc();
+  setInterval(sleepCalc, 60000);
+
+  // ===== Кубик / Монетка =====
+  window.rollDice = function(){
+    const el = document.getElementById('diceResult');
+    if (!el) return;
+    el.classList.add('rolling');
+    const faces = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+    let n = 0;
+    const iv = setInterval(() => {
+      el.textContent = faces[Math.floor(Math.random() * 6)];
+      n++;
+      if (n > 10) {
+        clearInterval(iv);
+        el.classList.remove('rolling');
+      }
+    }, 60);
+  };
+  window.flipCoin = function(){
+    const el = document.getElementById('diceResult');
+    if (!el) return;
+    el.classList.add('rolling');
+    let n = 0;
+    const iv = setInterval(() => {
+      el.textContent = Math.random() < 0.5 ? '🪙 Орёл' : '🪙 Решка';
+      n++;
+      if (n > 8) {
+        clearInterval(iv);
+        el.classList.remove('rolling');
+      }
+    }, 80);
+  };
 })();
 
 </script>
