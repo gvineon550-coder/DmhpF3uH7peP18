@@ -52,14 +52,14 @@ body.aurora::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:n
 .card-planes{grid-column:span 6}.card-article{grid-column:span 6}
 .card-habits{grid-column:span 4}.card-todo{grid-column:span 4}.card-notes{grid-column:span 4}
 .card-pomo{grid-column:span 3;text-align:center}.card-mood{grid-column:span 3;text-align:center}.card-water{grid-column:span 3;text-align:center}.card-conv{grid-column:span 3}
-.card-tools{grid-column:span 4}.card-dates{grid-column:span 4}.card-sudoku{grid-column:span 4}
+.card-tools{grid-column:span 4}.card-dates{grid-column:span 4}.card-issmap{grid-column:span 4}
 @media(max-width:1000px){
   .card-clock,.card-weather,.card-iss,.card-kp,.card-aq,.card-uv{grid-column:span 6}
   .card-currency,.card-crypto,.card-calendar,.card-art,.card-gh,.card-moon,.card-ny,.card-track{grid-column:span 3}
   .card-news,.card-eq,.card-history,.card-quote{grid-column:span 6}
   .card-solar,.card-apod,.card-asteroids,.card-launch,.card-museum,.card-planes,.card-article{grid-column:span 6}
   .card-cat,.card-sleep,.card-dice,.card-fact{grid-column:span 3}
-  .card-habits,.card-todo,.card-notes,.card-tools,.card-dates,.card-sudoku{grid-column:span 6}
+  .card-habits,.card-todo,.card-notes,.card-tools,.card-dates,.card-issmap{grid-column:span 6}
   .card-pomo,.card-mood,.card-water,.card-conv{grid-column:span 3}
 }
 .clock{font-size:clamp(56px,10vw,88px);font-weight:200;letter-spacing:-0.05em;line-height:0.95;font-variant-numeric:tabular-nums;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
@@ -179,6 +179,11 @@ body.aurora::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:n
 .article-desc{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:8px}
 .article-source{font-size:10px;color:var(--muted);opacity:0.7}
 
+/* ISS map */
+.issmap-wrap{width:100%;border-radius:12px;overflow:hidden;background:#0a1628;margin-bottom:10px}
+.issmap{width:100%;height:auto;display:block;aspect-ratio:2/1}
+.issmap-info{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-family:ui-monospace,monospace}
+
 /* Tools */
 .tool-input-row{display:flex;gap:6px;margin-top:10px}
 .tool-input-row input{flex:1;background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:10px;font-size:13px;font-family:inherit}
@@ -221,14 +226,6 @@ body.aurora::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:n
 .date-row:last-child{border-bottom:none}
 .date-label-txt{flex:1}.date-days{font-weight:600;color:var(--accent2);font-variant-numeric:tabular-nums}
 .date-del{background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:0 4px}
-.sudoku-grid{display:grid;grid-template-columns:repeat(9,1fr);gap:1px;background:var(--border);border:2px solid var(--accent);border-radius:8px;overflow:hidden;max-width:280px;margin:0 auto}
-.sudoku-cell{aspect-ratio:1;background:var(--panel2);border:none;color:var(--text);font-size:16px;font-weight:500;text-align:center;font-family:inherit;padding:0;cursor:pointer}
-.sudoku-cell:focus{outline:none;background:var(--accent);color:#fff}
-.sudoku-cell.given{color:var(--accent2);font-weight:700;cursor:default}
-.sudoku-cell.wrong{color:var(--bad)}
-.sudoku-cell:nth-child(3n):not(:nth-child(9n)){border-right:2px solid var(--accent)}
-.sudoku-cell:nth-child(n+19):nth-child(-n+27),.sudoku-cell:nth-child(n+46):nth-child(-n+54){border-bottom:2px solid var(--accent)}
-.sudoku-status{text-align:center;font-size:12px;color:var(--muted);margin-top:10px}
 .sleep-block{font-size:12px}
 .sleep-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);color:var(--muted);flex-wrap:wrap;gap:4px}
 .sleep-row:last-of-type{border-bottom:none}
@@ -280,13 +277,13 @@ body.aurora::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:n
   </div>
 
   <div class="card card-weather"><h3>🌤 Погода · Нальчик</h3><div class="wx-hero"><div class="wx-icon">⛈️</div><div><div class="wx-temp">16°</div><div class="wx-feels">ощущается 15°</div></div></div><div class="wx-meta"><div class="wx-item"><span>💧</span><b>72%</b></div><div class="wx-item"><span>💨</span><b>4</b><small>км/ч</small></div><div class="wx-item"><span>🔽</span><b>1018</b><small>мм</small></div></div><div class="wx-sun"><div><span>🌅</span> 05:58 AM</div><div><span>🌇</span> 05:54 PM</div></div><div class="wx-forecast"><div class="fc-day"><div class="fc-date">09.27</div><div class="fc-icon">⛈️</div><div class="fc-temps"><span class="fc-max">↑18°</span><span class="fc-min">↓11°</span></div></div><div class="fc-day"><div class="fc-date">09.28</div><div class="fc-icon">⛈️</div><div class="fc-temps"><span class="fc-max">↑17°</span><span class="fc-min">↓10°</span></div></div><div class="fc-day"><div class="fc-date">09.29</div><div class="fc-icon">⛈️</div><div class="fc-temps"><span class="fc-max">↑11°</span><span class="fc-min">↓8°</span></div></div></div></div>
-  <div class="card card-iss"><h3>🛰 МКС</h3><div class="iss-hero"><div class="iss-icon">🛰</div><div><div class="iss-dist">12402 <span class="iss-dist-unit">км от тебя</span></div><div class="iss-sub">высота 425 км · 27572 км/ч</div></div></div><div class="iss-meta"><span>📍 -29.03°, 136.6°</span><span>👁 eclipsed</span></div></div>
-  <div class="card card-kp"><h3>🌌 Магнитное поле</h3><div class="kp-hero"><div class="kp-value" style="color:#4ade80">0.3</div><div class="kp-label">Kp-индекс</div></div><div class="kp-level" style="color:#4ade80">Спокойно</div><div class="kp-bars"><div class="kp-bar" style="height:14%" title="Kp=1.33"></div><div class="kp-bar" style="height:11%" title="Kp=1.0"></div><div class="kp-bar" style="height:11%" title="Kp=1.0"></div><div class="kp-bar" style="height:11%" title="Kp=1.0"></div><div class="kp-bar" style="height:7%" title="Kp=0.67"></div><div class="kp-bar" style="height:3%" title="Kp=0.33"></div></div><div class="kp-axis"><span>6ч назад</span><span>сейчас</span></div></div>
+  <div class="card card-iss"><h3>🛰 МКС</h3><div class="iss-hero"><div class="iss-icon">🛰</div><div><div class="iss-dist">18313 <span class="iss-dist-unit">км от тебя</span></div><div class="iss-sub">высота 435 км · 27538 км/ч</div></div></div><div class="iss-meta"><span>📍 -39.99°, -116.36°</span><span>👁 daylight</span></div></div>
+  <div class="card card-kp"><h3>🌌 Магнитное поле</h3><div class="kp-hero"><div class="kp-value" style="color:#4ade80">0.3</div><div class="kp-label">Kp-индекс</div></div><div class="kp-level" style="color:#4ade80">Спокойно</div><div class="kp-bars"><div class="kp-bar" style="height:11%" title="Kp=1.0"></div><div class="kp-bar" style="height:11%" title="Kp=1.0"></div><div class="kp-bar" style="height:7%" title="Kp=0.67"></div><div class="kp-bar" style="height:7%" title="Kp=0.67"></div><div class="kp-bar" style="height:3%" title="Kp=0.33"></div><div class="kp-bar" style="height:3%" title="Kp=0.33"></div></div><div class="kp-axis"><span>6ч назад</span><span>сейчас</span></div></div>
   <div class="card card-aq"><h3>🌬 Воздух</h3><div class="aq-hero"><div class="aq-value" style="color:#86efac">35</div><div class="aq-label">AQI</div></div><div class="aq-level" style="color:#86efac">Хороший</div><div class="aq-meta"><div><b>PM2.5</b> 12.6</div><div><b>PM10</b> 23.6</div></div></div>
-  <div class="card card-uv"><h3>🌡 УФ</h3><div class="aq-hero"><div class="aq-value" style="color:#4ade80">0.3</div><div class="aq-label">УФ</div></div><div class="aq-level" style="color:#4ade80">Низкий</div><div class="aq-meta"><div><b>Макс.</b> 4</div></div></div>
+  <div class="card card-uv"><h3>🌡 УФ</h3><div class="aq-hero"><div class="aq-value" style="color:#4ade80">0.1</div><div class="aq-label">УФ</div></div><div class="aq-level" style="color:#4ade80">Низкий</div><div class="aq-meta"><div><b>Макс.</b> 4</div></div></div>
   <div class="card card-currency"><h3>💱 Курсы ЦБ</h3><div class="cur-row"><span class="cur-flag">🇺🇸</span><span class="cur-code">USD</span><span class="cur-val">84.34 ₽</span></div><div class="cur-row"><span class="cur-flag">🇪🇺</span><span class="cur-code">EUR</span><span class="cur-val">95.87 ₽</span></div><div class="cur-row"><span class="cur-flag">🇨🇳</span><span class="cur-code">CNY</span><span class="cur-val">12.54 ₽</span></div></div>
-  <div class="card card-crypto"><h3>💰 Крипта</h3><div class="cur-row"><span class="cur-flag">₿</span><span class="cur-code">BTC</span><span class="cur-val">$84,903</span><span class="cur-chg" style="color:var(--good)">▲ 1.1%</span></div><div class="cur-row"><span class="cur-flag">Ξ</span><span class="cur-code">ETH</span><span class="cur-val">$2,702</span><span class="cur-chg" style="color:var(--good)">▲ 0.6%</span></div><div class="cur-row"><span class="cur-flag">💎</span><span class="cur-code">TON</span><span class="cur-val">$1.59</span><span class="cur-chg" style="color:var(--good)">▲ 8.4%</span></div></div>
-  <div class="card card-news"><h3>📰 Новости · 5 источников</h3><div class="news-grid"><a class="news-card" href="https://www.rbc.ru/politics/27/09/2026/6ab920ade48b902c45d45637" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">RBC</span><span class="news-ago">только что</span></div><div class="news-title">Париж объяснил предложение снять санкции ЕС с Усманова</div><div class="news-desc">Франция сочла исключение бизнесмена из санкционного списка отвечающим ее интересам, заявил глава МИД Барро. Одновременно Париж ...</div></a><a class="news-card" href="https://lenta.ru/news/2026/09/27/kolambus-obygral-detroyt-v-predsezonnom-matche-nhl/" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">Lenta</span><span class="news-ago">4 мин</span></div><div class="news-title">«Коламбус» обыграл «Детройт» в предсезонном матче НХЛ</div></a><a class="news-card" href="https://lenta.ru/news/2026/09/27/zenit-obygral-shanhay-fenhua-v-tovarischeskom-matche/" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">Lenta</span><span class="news-ago">4 мин</span></div><div class="news-title">«Зенит» обыграл «Шанхай Феньхуа» в товарищеском матче</div></a><a class="news-card" href="https://tass.ru/sport/28156307" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">TASS</span><span class="news-ago">5 мин</span></div><div class="news-title">Футболист &quot;Локомотива&quot; Сильянов пропустит ближайшие матчи сборной России</div><div class="news-desc">Российская национальная команда сыграет со сборными Ирана, Намибии и Нигерии</div></a><a class="news-card" href="https://tass.ru/proisshestviya/28156299" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">TASS</span><span class="news-ago">6 мин</span></div><div class="news-title">В Волгограде подозреваемый в убийстве многодетного отца признал вину</div><div class="news-desc">По словам фигуранта, он предупредил о выстреле</div></a><a class="news-card" href="https://tass.ru/sport/28156305" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">TASS</span><span class="news-ago">6 мин</span></div><div class="news-title">СКА одержал четвертую победу подряд в КХЛ</div><div class="news-desc">Петербургский клуб победил в Астане &quot;Барыс&quot; со счетом 5:3</div></a><a class="news-card" href="https://tass.ru/mezhdunarodnaya-panorama/28156303" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">TASS</span><span class="news-ago">8 мин</span></div><div class="news-title">Арагчи: Иран обогащает уран до 60% в мирных целях</div></a><a class="news-card" href="https://tass.ru/mezhdunarodnaya-panorama/28156301" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">TASS</span><span class="news-ago">9 мин</span></div><div class="news-title">Иран надеется на дипломатию с США, но не видит причин к ней возвращаться</div></a><a class="news-card" href="https://lenta.ru/news/2026/09/27/zaharova-obratila-vnimanie-na-vazhnuyu-detal-na-peregovorah-lavrova-i-vadefulya/" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">Lenta</span><span class="news-ago">11 мин</span></div><div class="news-title">Захарова обратила внимание на важную деталь на переговорах Лаврова и Вадефуля</div></a><a class="news-card" href="https://lenta.ru/news/2026/09/27/vetlugin-zamenil-mozaleva-na-turnire-v-batumi/" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">Lenta</span><span class="news-ago">14 мин</span></div><div class="news-title">Ветлугин заменил Мозалева на турнире в Батуми</div></a><a class="news-card" href="https://lenta.ru/news/2026/09/27/semenenko-vyigral-memorial-ondreya-nepely/" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">Lenta</span><span class="news-ago">14 мин</span></div><div class="news-title">Семененко выиграл Мемориал Ондрея Непелы</div></a><a class="news-card" href="https://www.rbc.ru/politics/27/09/2026/6ab90ea675d4be385637e2c6" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">RBC</span><span class="news-ago">18 мин</span></div><div class="news-title">WSJ узнала о новой тактике КНДР для создания нагрузки на западную ПВО</div><div class="news-desc">КНДР впервые провела учения с одновременным применением ударных беспилотников, ракет, реактивных снарядов и дальнобойной артилл...</div></a></div></div>
+  <div class="card card-crypto"><h3>💰 Крипта</h3><div class="cur-row"><span class="cur-flag">₿</span><span class="cur-code">BTC</span><span class="cur-val">$84,740</span><span class="cur-chg" style="color:var(--good)">▲ 0.9%</span></div><div class="cur-row"><span class="cur-flag">Ξ</span><span class="cur-code">ETH</span><span class="cur-val">$2,690</span><span class="cur-chg" style="color:var(--good)">▲ 0.1%</span></div><div class="cur-row"><span class="cur-flag">💎</span><span class="cur-code">TON</span><span class="cur-val">$1.59</span><span class="cur-chg" style="color:var(--good)">▲ 7.8%</span></div></div>
+  <div class="card card-news"><h3>📰 Новости · 5 источников</h3><div class="news-grid"><a class="news-card" href="https://lenta.ru/news/2026/09/27/v-mid-irana-prigrozili-ssha-voynoy-sudnogo-dnya/" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">Lenta</span><span class="news-ago">2 мин</span></div><div class="news-title">В МИД Ирана пригрозили США войной Судного дня</div></a><a class="news-card" href="https://lenta.ru/news/2026/09/27/pevitsa-shakira-rezko-podnyala-tseny-na-otdyh-v-egipte/" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">Lenta</span><span class="news-ago">3 мин</span></div><div class="news-title">Певица Шакира резко подняла цены на отдых в Египте</div></a><a class="news-card" href="https://tass.ru/mezhdunarodnaya-panorama/28156347" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">TASS</span><span class="news-ago">4 мин</span></div><div class="news-title">Арагчи назвал ошибочными утверждения США о нескольких центрах власти в Иране</div></a><a class="news-card" href="https://lenta.ru/news/2026/09/27/tri-cheloveka-popali-v-smertelnoe-dtp-v-rossiyskom-regione/" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">Lenta</span><span class="news-ago">4 мин</span></div><div class="news-title">Три человека попали в смертельное ДТП в российском регионе</div></a><a class="news-card" href="https://www.rbc.ru/politics/27/09/2026/6ab91ad8667ef03ad6dee832" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">RBC</span><span class="news-ago">5 мин</span></div><div class="news-title">Трамп заявил о вывозе рекордного объема нефти через Ормузский пролив</div><div class="news-desc">По словам Трампа, прошедшей ночью США вывезли через Ормузский пролив больше нефти, чем до войны с Ираном. До этого он отверг пр...</div></a><a class="news-card" href="https://tass.ru/obschestvo/28156321" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">TASS</span><span class="news-ago">6 мин</span></div><div class="news-title">В Ницце пляж переименовали в честь Брижит Бардо в память о вкладе в защиту животных</div><div class="news-desc">Глава городской администрации Эрик Сьотти отметил, что этот шаг является частью политики по расширению городского пространства ...</div></a><a class="news-card" href="https://tass.ru/obschestvo/28156333" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">TASS</span><span class="news-ago">6 мин</span></div><div class="news-title">Родившая тройню минчанка после обращения к Лукашенко получила в подарок квартиру</div><div class="news-desc">Женщина записала видео с просьбой предоставить ее семье жилье</div></a><a class="news-card" href="https://tass.ru/obschestvo/28156323" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">TASS</span><span class="news-ago">7 мин</span></div><div class="news-title">В Ингушетии более 180 детей получили хирургическую помощь от благотворителей</div><div class="news-desc">Специалисты провели 79 запланированных операций</div></a><a class="news-card" href="https://tass.ru/politika/28156339" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">TASS</span><span class="news-ago">7 мин</span></div><div class="news-title">Миронов назвал причины низких результатов &quot;Справедливой России&quot; на выборах</div><div class="news-desc">Лидер партии отметил при этом, что с оценкой не нужно спешить до подробного анализа данных по регионам</div></a><a class="news-card" href="https://lenta.ru/news/2026/09/27/v-britanii-posle-vzryva-u-bazy-vvs-ssha-nachalis-zaderzhaniya/" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">Lenta</span><span class="news-ago">10 мин</span></div><div class="news-title">В Британии после взрыва у базы ВВС США начались задержания</div></a><a class="news-card" href="https://lenta.ru/news/2026/09/27/roberto-karlos-zayavil-o-potere-zarabotannyh-deneg/" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">Lenta</span><span class="news-ago">14 мин</span></div><div class="news-title">Роберто Карлос заявил о потере заработанных денег</div></a><a class="news-card" href="https://www.rbc.ru/politics/27/09/2026/6ab92265be0c42a4cf1da0ef" target="_blank" rel="noopener"><div class="news-head"><span class="news-source">RBC</span><span class="news-ago">14 мин</span></div><div class="news-title">Токаев поручил провести реформу армии после гибели 14 военных на учениях</div><div class="news-desc">После гибели военных в ходе учений на Каспии Токаев потребовал перестроить систему командования и провести комплексную проверку...</div></a></div></div>
   <div class="card card-calendar"><h3>📅 Сентябрь 2026</h3><div class="cal-month">Сентябрь 2026</div><div class="cal-grid"><div class="cal-head">Пн</div><div class="cal-head">Вт</div><div class="cal-head">Ср</div><div class="cal-head">Чт</div><div class="cal-head">Пт</div><div class="cal-head">Сб</div><div class="cal-head">Вс</div><div class="cal-cell cal-empty"></div><div class="cal-cell" title="📚 День знаний">1<span class="cal-hol">•</span></div><div class="cal-cell">2</div><div class="cal-cell">3</div><div class="cal-cell">4</div><div class="cal-cell cal-weekend">5</div><div class="cal-cell cal-weekend">6</div><div class="cal-cell">7</div><div class="cal-cell">8</div><div class="cal-cell">9</div><div class="cal-cell">10</div><div class="cal-cell">11</div><div class="cal-cell cal-weekend">12</div><div class="cal-cell cal-weekend">13</div><div class="cal-cell">14</div><div class="cal-cell">15</div><div class="cal-cell">16</div><div class="cal-cell">17</div><div class="cal-cell">18</div><div class="cal-cell cal-weekend">19</div><div class="cal-cell cal-weekend">20</div><div class="cal-cell">21</div><div class="cal-cell">22</div><div class="cal-cell">23</div><div class="cal-cell">24</div><div class="cal-cell">25</div><div class="cal-cell cal-weekend">26</div><div class="cal-cell cal-today">27</div><div class="cal-cell">28</div><div class="cal-cell">29</div><div class="cal-cell">30</div></div></div>
   <div class="card card-art"><svg viewBox="0 0 400 240" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><filter id="b166790"><feGaussianBlur stdDeviation="26"/></filter><radialGradient id="v166790" cx="50%" cy="50%" r="70%"><stop offset="60%" stop-color="rgba(0,0,0,0)"/><stop offset="100%" stop-color="rgba(0,0,0,0.55)"/></radialGradient></defs><rect width="400" height="240" fill="#0a0e1a"/><g filter="url(#b166790)"><circle cx="213" cy="134" r="155" fill="#00f2fe" opacity="0.55"/><circle cx="275" cy="120" r="125" fill="#00f2fe" opacity="0.30"/><circle cx="285" cy="183" r="112" fill="#4facfe" opacity="0.36"/><circle cx="75" cy="221" r="93" fill="#4facfe" opacity="0.45"/><circle cx="68" cy="47" r="130" fill="#4facfe" opacity="0.33"/><circle cx="94" cy="115" r="87" fill="#4facfe" opacity="0.63"/><circle cx="342" cy="53" r="127" fill="#00f2fe" opacity="0.44"/></g><line x1="232" y1="142" x2="3" y2="229" stroke="white" stroke-width="0.6" opacity="0.12"/><line x1="395" y1="41" x2="68" y2="94" stroke="white" stroke-width="0.6" opacity="0.26"/><line x1="27" y1="218" x2="294" y2="184" stroke="white" stroke-width="0.9" opacity="0.26"/><line x1="116" y1="133" x2="152" y2="136" stroke="white" stroke-width="0.4" opacity="0.20"/><line x1="18" y1="235" x2="224" y2="85" stroke="white" stroke-width="0.6" opacity="0.28"/><line x1="222" y1="6" x2="204" y2="31" stroke="white" stroke-width="0.7" opacity="0.27"/><line x1="118" y1="229" x2="172" y2="29" stroke="white" stroke-width="0.8" opacity="0.15"/><line x1="221" y1="204" x2="387" y2="35" stroke="white" stroke-width="0.6" opacity="0.22"/><line x1="237" y1="84" x2="300" y2="1" stroke="white" stroke-width="0.8" opacity="0.13"/><line x1="2" y1="141" x2="123" y2="74" stroke="white" stroke-width="1.0" opacity="0.24"/><circle cx="42" cy="168" r="1.9" fill="white" opacity="0.54"/><circle cx="380" cy="126" r="1.2" fill="white" opacity="0.69"/><circle cx="6" cy="133" r="1.3" fill="white" opacity="0.24"/><circle cx="264" cy="17" r="0.8" fill="white" opacity="0.69"/><circle cx="310" cy="202" r="1.4" fill="white" opacity="0.36"/><circle cx="95" cy="125" r="0.5" fill="white" opacity="0.41"/><circle cx="30" cy="198" r="0.6" fill="white" opacity="0.63"/><circle cx="371" cy="240" r="0.6" fill="white" opacity="0.20"/><circle cx="326" cy="147" r="1.1" fill="white" opacity="0.56"/><circle cx="1" cy="106" r="0.7" fill="white" opacity="0.65"/><circle cx="124" cy="175" r="0.7" fill="white" opacity="0.67"/><circle cx="100" cy="45" r="1.0" fill="white" opacity="0.52"/><circle cx="36" cy="131" r="1.0" fill="white" opacity="0.44"/><circle cx="293" cy="69" r="1.6" fill="white" opacity="0.34"/><circle cx="330" cy="159" r="1.9" fill="white" opacity="0.29"/><circle cx="175" cy="233" r="1.0" fill="white" opacity="0.41"/><circle cx="388" cy="155" r="0.5" fill="white" opacity="0.48"/><circle cx="127" cy="41" r="1.9" fill="white" opacity="0.61"/><circle cx="381" cy="54" r="0.8" fill="white" opacity="0.20"/><circle cx="149" cy="143" r="1.9" fill="white" opacity="0.64"/><circle cx="267" cy="122" r="1.1" fill="white" opacity="0.55"/><circle cx="91" cy="156" r="2.0" fill="white" opacity="0.61"/><circle cx="262" cy="173" r="0.8" fill="white" opacity="0.49"/><circle cx="183" cy="79" r="1.1" fill="white" opacity="0.60"/><circle cx="172" cy="40" r="0.8" fill="white" opacity="0.32"/><circle cx="91" cy="187" r="1.4" fill="white" opacity="0.67"/><circle cx="286" cy="200" r="1.3" fill="white" opacity="0.27"/><circle cx="118" cy="99" r="1.5" fill="white" opacity="0.41"/><circle cx="281" cy="240" r="1.8" fill="white" opacity="0.34"/><circle cx="101" cy="162" r="1.1" fill="white" opacity="0.59"/><circle cx="346" cy="207" r="0.5" fill="white" opacity="0.27"/><circle cx="374" cy="11" r="1.8" fill="white" opacity="0.32"/><circle cx="390" cy="160" r="1.3" fill="white" opacity="0.68"/><circle cx="130" cy="42" r="1.5" fill="white" opacity="0.40"/><circle cx="106" cy="221" r="1.6" fill="white" opacity="0.54"/><circle cx="131" cy="15" r="1.3" fill="white" opacity="0.44"/><circle cx="159" cy="83" r="0.9" fill="white" opacity="0.34"/><circle cx="200" cy="115" r="1.3" fill="white" opacity="0.30"/><circle cx="48" cy="191" r="1.7" fill="white" opacity="0.55"/><circle cx="333" cy="32" r="1.5" fill="white" opacity="0.43"/><circle cx="69" cy="16" r="1.5" fill="white" opacity="0.56"/><circle cx="324" cy="154" r="0.5" fill="white" opacity="0.67"/><circle cx="210" cy="33" r="1.0" fill="white" opacity="0.40"/><circle cx="254" cy="80" r="1.4" fill="white" opacity="0.28"/><circle cx="308" cy="87" r="0.8" fill="white" opacity="0.52"/><circle cx="199" cy="133" r="1.5" fill="white" opacity="0.55"/><circle cx="247" cy="28" r="1.1" fill="white" opacity="0.53"/><circle cx="243" cy="159" r="2.0" fill="white" opacity="0.23"/><circle cx="381" cy="69" r="1.6" fill="white" opacity="0.44"/><circle cx="9" cy="4" r="1.2" fill="white" opacity="0.51"/><rect width="400" height="240" fill="url(#v166790)"/></svg><div class="art-label">🎨 по погоде</div></div>
   <div class="card card-gh"></div>
@@ -300,13 +297,12 @@ body.aurora::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:n
   <div class="card card-solar"><h3>🌞 Солнце прямо сейчас</h3><div class="space-grid"><a class="space-img" href="https://sdo.gsfc.nasa.gov/data/" target="_blank"><img src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_256_HMIIF.jpg" loading="lazy"><span class="space-label">Видимое</span></a><a class="space-img" href="https://sdo.gsfc.nasa.gov/data/" target="_blank"><img src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_256_0171.jpg" loading="lazy"><span class="space-label">Корона</span></a><a class="space-img" href="https://sdo.gsfc.nasa.gov/data/" target="_blank"><img src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_256_0304.jpg" loading="lazy"><span class="space-label">Атмосфера</span></a></div><div class="space-note">📸 NASA SDO · каждые 15 мин</div></div>
   <div class="card card-apod"><h3>🌌 Фото дня · NASA</h3><a class="apod-card" href="https://apod.nasa.gov/apod/image/2609/M31Before_Scherer_4298.jpg" target="_blank"><div><img class="apod-img" src="https://apod.nasa.gov/apod/image/2609/M31Before_Scherer_960.jpg" loading="lazy" onerror="this.style.display='none'"></div><div class="apod-title">Andromeda before Photoshop</div><div class="apod-date">2026-09-27</div><div class="apod-desc">What does the Andromeda galaxy really look like? The featured image shows how our Milky Way Galaxy&#x27;s closest major galactic neighbor really appears in a long exposure through Earth&#x27;s busy skies and with a digital camera that introduces normal imperfe...</div></a></div>
   <div class="card card-asteroids"><h3>☄️ Астероиды недели</h3><div class="ast-row"><span class="ast-icon" style="color:var(--accent2)">☄️</span><div class="ast-info"><div class="ast-name">2014 TU</div><div class="ast-meta">09-27 · 41 м · 56,092 км/ч</div></div></div><div class="ast-row"><span class="ast-icon" style="color:var(--accent2)">☄️</span><div class="ast-info"><div class="ast-name">2019 DJ1</div><div class="ast-meta">09-27 · 19 м · 44,519 км/ч</div></div></div><div class="ast-row"><span class="ast-icon" style="color:var(--accent2)">☄️</span><div class="ast-info"><div class="ast-name">2019 SH7</div><div class="ast-meta">09-27 · 95 м · 34,525 км/ч</div></div></div><div class="ast-row"><span class="ast-icon" style="color:var(--bad)">⚠️</span><div class="ast-info"><div class="ast-name">523934 1998 FF14</div><div class="ast-meta">09-28 · 325 м · 84,523 км/ч</div></div></div></div>
-  <div class="card card-launch"><h3>🚀 Запуск ракеты</h3><div class="launch-card"><div class="launch-icon">🚀</div><div class="launch-info"><div class="launch-name">Starship | Starlink Group 31-1 (Starship Flight 14)</div><div class="launch-provider">?</div><div class="launch-loc">?</div><div class="launch-countdown">⏱ 21ч 50м</div></div></div></div>
+  <div class="card card-launch"><h3>🚀 Запуск ракеты</h3><div class="launch-card"><div class="launch-icon">🚀</div><div class="launch-info"><div class="launch-name">Starship | Starlink Group 31-1 (Starship Flight 14)</div><div class="launch-provider">?</div><div class="launch-loc">?</div><div class="launch-countdown">⏱ 21ч 27м</div></div></div></div>
   <div class="card card-museum"><h3>🎨 Картина дня</h3><a class="art-card-museum" href="https://www.metmuseum.org/art/collection/search/462738" target="_blank"><img class="museum-img" src="https://images.metmuseum.org/CRDImages/md/web-large/sf99-35-582s1.jpg" loading="lazy" onerror="this.style.display='none'"><div class="museum-title">Rose Noble of Edward IV (1461-1483)</div><div class="museum-artist">Неизвестный, 1461–83</div><div class="museum-museum">🏛 The Met</div></a></div>
-  <div class="card card-cat"><h3>🐱 Кот дня</h3><a class="cat-card" href="https://s3.us-west-2.amazonaws.com/cdn2.thecatapi.com/images/MK-sYESvO.jpg" target="_blank"><img src="https://s3.us-west-2.amazonaws.com/cdn2.thecatapi.com/images/MK-sYESvO.jpg" loading="lazy"></a></div>
+  <div class="card card-cat"><h3>🐱 Кот дня</h3><a class="cat-card" href="https://s3.us-west-2.amazonaws.com/cdn2.thecatapi.com/images/cka.jpg" target="_blank"><img src="https://s3.us-west-2.amazonaws.com/cdn2.thecatapi.com/images/cka.jpg" loading="lazy"></a></div>
 
-  <div class="card card-planes"><h3>✈️ Самолёты над Нальчиком</h3><div class="plane-row"><span class="plane-icon">✈️</span><div class="plane-info"><div class="plane-name">KAL955</div><div class="plane-meta">11582 м · 142 км/ч · 138 км</div></div><span class="plane-country">Republic of Korea</span></div><div class="plane-row"><span class="plane-icon">✈️</span><div class="plane-info"><div class="plane-name">GTI9476</div><div class="plane-meta">11887 м · 938 км/ч · 169 км</div></div><span class="plane-country">United States</span></div><div class="plane-row"><span class="plane-icon">✈️</span><div class="plane-info"><div class="plane-name">GEC8401</div><div class="plane-meta">10363 м · 824 км/ч · 173 км</div></div><span class="plane-country">Germany</span></div><div class="plane-row"><span class="plane-icon">✈️</span><div class="plane-info"><div class="plane-name">CPA260</div><div class="plane-meta">10668 м · 985 км/ч · 175 км</div></div><span class="plane-country">China</span></div><div class="plane-row"><span class="plane-icon">✈️</span><div class="plane-info"><div class="plane-name">CSC3828</div><div class="plane-meta">11278 м · 944 км/ч · 184 км</div></div><span class="plane-country">China</span></div></div>
-
-  <div class="card card-article"><h3>📖 Статья дня</h3><a class="article-card" href="https://ru.wikipedia.org/wiki/%D0%90%D0%BB%D0%B5%D0%BA%D1%81%D0%B0%D0%BD%D0%B4%D0%B5%D1%80%2C_%D0%A5%D0%B0%D1%80%D0%BE%D0%BB%D1%8C%D0%B4" target="_blank"><img class="article-thumb" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3c/Harold_Alexander_E010750678-v8.jpg/330px-Harold_Alexander_E010750678-v8.jpg?utm_source=ru.wikipedia.org&utm_campaign=api&utm_content=thumbnail" loading="lazy" onerror="this.style.display='none'"><div class="article-title">Александер, Харольд</div><div class="article-desc">Ха́рольд Ру́перт Леофрик Джордж Алекса́ндер, 1-й граф Александер Тунисский — британский военачальник Второй мировой войны. Фельдмаршал (1944)....</div><div class="article-source">📖 Wikipedia RU</div></a></div>
+  <div class="card card-planes"><h3>✈️ Самолёты над Нальчиком</h3><div class="plane-row"><span class="plane-icon">✈️</span><div class="plane-info"><div class="plane-name">AHY046</div><div class="plane-meta">10066 м · 400 км/ч · 142 км</div></div><span class="plane-country">United Kingdom</span></div></div>
+  <div class="card card-article"><h3>📖 Статья дня</h3><a class="article-card" href="https://ru.wikipedia.org/wiki/%D0%A1%D0%B5%D0%BD%D1%82-%D0%96%D0%B5%D0%BC-%D1%81%D1%8E%D1%80-%D0%9B%D1%83%D0%B0%D1%80" target="_blank"><img class="article-thumb" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/Sainte-Gemmes-sur-Loire_mairie.jpg/330px-Sainte-Gemmes-sur-Loire_mairie.jpg?utm_source=ru.wikipedia.org&utm_campaign=api&utm_content=thumbnail" loading="lazy" onerror="this.style.display='none'"><div class="article-title">Сент-Жем-сюр-Луар</div><div class="article-desc">Сент-Жем-сюр-Луар — коммуна на западе Франции, регион Пеи-де-ла-Луар, департамент Мен и Луара, округ Анже, кантон Анже-2. Пригород Анже, примыкает к нему с юга и юго-запада. Расположен между реками Мен и Луару в месте их соединения, в 3 км от автомагистрали А87....</div><div class="article-source">📖 Wikipedia RU</div></a></div>
 
   <div class="card card-habits">
     <h3>🎯 Мои привычки</h3>
@@ -387,10 +383,30 @@ body.aurora::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:n
     </div>
   </div>
 
-  <div class="card card-sudoku">
-    <h3>🧩 Судоку дня</h3>
-    <div class="sudoku-grid" id="sudokuGrid"></div>
-    <div class="sudoku-status" id="sudokuStatus"></div>
+  <div class="card card-issmap">
+    <h3>🗺 МКС на карте мира</h3>
+    <div class="issmap-wrap">
+      <svg class="issmap" viewBox="0 0 360 180" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+        <rect width="360" height="180" fill="#0a1628"/>
+        <line x1="0" y1="45" x2="360" y2="45" stroke="#1e3a5f" stroke-width="0.5"/>
+        <line x1="0" y1="90" x2="360" y2="90" stroke="#1e3a5f" stroke-width="0.5"/>
+        <line x1="0" y1="135" x2="360" y2="135" stroke="#1e3a5f" stroke-width="0.5"/>
+        <line x1="90" y1="0" x2="90" y2="180" stroke="#1e3a5f" stroke-width="0.5"/>
+        <line x1="180" y1="0" x2="180" y2="180" stroke="#1e3a5f" stroke-width="0.5"/>
+        <line x1="270" y1="0" x2="270" y2="180" stroke="#1e3a5f" stroke-width="0.5"/>
+        <line x1="0" y1="90" x2="360" y2="90" stroke="#60a5fa" stroke-width="0.8" stroke-dasharray="3,3"/>
+        <circle id="issDot2" cx="180" cy="90" r="12" fill="none" stroke="#facc15" stroke-width="1" opacity="0.5">
+          <animate attributeName="r" values="5;15;5" dur="2s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.6;0;0.6" dur="2s" repeatCount="indefinite"/>
+        </circle>
+        <circle id="issDot" cx="180" cy="90" r="5" fill="#facc15" stroke="#fff" stroke-width="1"/>
+        <circle cx="224" cy="47" r="3" fill="#f87171"/>
+      </svg>
+    </div>
+    <div class="issmap-info">
+      <span id="issMapCoords">—</span>
+      <span id="issMapDist">—</span>
+    </div>
   </div>
 
   <div class="card card-sleep">
@@ -422,7 +438,7 @@ body.aurora::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:n
 </div>
 
 <div class="footer">
-  Обновлено 14:24 МСК · обновляется каждый час
+  Обновлено 14:47 МСК · обновляется каждый час
 </div>
 
 </div>
@@ -445,8 +461,7 @@ const EXCH = {usd: 84.34, eur: 95.87, cny: 12.54};
   }
   tick(); setInterval(tick, 1000);
   function counters(){
-    const now = new Date();
-    const msk = new Date(now.toLocaleString('en-US', {timeZone:'Europe/Moscow'}));
+    const msk = new Date(new Date().toLocaleString('en-US', {timeZone:'Europe/Moscow'}));
     const daySec = msk.getHours()*3600 + msk.getMinutes()*60 + msk.getSeconds();
     document.getElementById('cnt-day').textContent = daySec.toLocaleString('ru-RU');
     const start = new Date(msk.getFullYear(), 0, 1);
@@ -535,7 +550,6 @@ const EXCH = {usd: 84.34, eur: 95.87, cny: 12.54};
     }
     draw();
   }
-  // Фаза сна
   function sleepCalc(){
     const msk = new Date(new Date().toLocaleString('en-US', {timeZone:'Europe/Moscow'}));
     [6, 7, 8].forEach(target => {
@@ -548,7 +562,6 @@ const EXCH = {usd: 84.34, eur: 95.87, cny: 12.54};
     });
   }
   sleepCalc(); setInterval(sleepCalc, 60000);
-  // Кубик / монетка
   window.rollDice = function(){
     const el = document.getElementById('diceResult'); if (!el) return;
     el.classList.add('rolling');
@@ -562,6 +575,44 @@ const EXCH = {usd: 84.34, eur: 95.87, cny: 12.54};
     let n = 0;
     const iv = setInterval(() => { el.textContent = Math.random() < 0.5 ? '🪙 Орёл' : '🪙 Решка'; n++; if (n > 8) { clearInterval(iv); el.classList.remove('rolling'); } }, 80);
   };
+
+  // ============ КАРТА МКС (LIVE) ============
+  let issLat = 0, issLon = 0;
+  function updateIssMap(){
+    const dot = document.getElementById('issDot');
+    const dot2 = document.getElementById('issDot2');
+    if (!dot) return;
+    const x = issLon + 180;
+    const y = 90 - issLat;
+    dot.setAttribute('cx', x);
+    dot.setAttribute('cy', y);
+    if (dot2) {
+      dot2.setAttribute('cx', x);
+      dot2.setAttribute('cy', y);
+    }
+    const coordsEl = document.getElementById('issMapCoords');
+    if (coordsEl) coordsEl.textContent = issLat.toFixed(1) + '°, ' + issLon.toFixed(1) + '°';
+    const lat1 = 43.4981, lon1 = 43.6189;
+    const R = 6371;
+    const dLat = (issLat - lat1) * Math.PI / 180;
+    const dLon = (issLon - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(issLat*Math.PI/180) * Math.sin(dLon/2)**2;
+    const dist = Math.round(2 * R * Math.asin(Math.sqrt(a)));
+    const distEl = document.getElementById('issMapDist');
+    if (distEl) distEl.textContent = dist.toLocaleString('ru-RU') + ' км до Нальчика';
+  }
+  async function fetchIssLive(){
+    try {
+      const r = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
+      if (!r.ok) return;
+      const d = await r.json();
+      issLat = d.latitude;
+      issLon = d.longitude;
+      updateIssMap();
+    } catch(e){}
+  }
+  fetchIssLive();
+  setInterval(fetchIssLive, 5000);
 
   // ============ ПРИВЫЧКИ ============
   function todayKey() { const d = new Date(); return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate(); }
@@ -577,7 +628,6 @@ const EXCH = {usd: 84.34, eur: 95.87, cny: 12.54};
     const h = loadHabits(); const key = todayKey();
     const idx = h[i].dates.indexOf(key);
     if (idx >= 0) h[i].dates.splice(idx, 1); else h[i].dates.push(key);
-    // Пересчёт streak
     let streak = 0; let d = new Date();
     while (true) {
       const k = d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
@@ -596,7 +646,7 @@ const EXCH = {usd: 84.34, eur: 95.87, cny: 12.54};
       const streak = x.streak || 0;
       return '<div class="habit-row">' +
         '<div class="habit-check ' + (done ? 'done' : '') + '" onclick="toggleHabit(' + i + ')">' + (done ? '✓' : '') + '</div>' +
-        '<span class="habit-name ' + (done ? 'done' : '') + '" onclick="toggleHabit(' + i + ')">' + x.name + '</span>' +
+        '<span class="habit-name ' + (done ? 'done' : '') + '" onclick="toggleHabit(' + i + ')">' + x.name.replace(/</g,'&lt;') + '</span>' +
         (streak > 1 ? '<span class="habit-streak">🔥' + streak + '</span>' : '') +
         '<button class="habit-del" onclick="delHabit(' + i + ')">×</button></div>';
     }).join('');
@@ -647,7 +697,7 @@ const EXCH = {usd: 84.34, eur: 95.87, cny: 12.54};
   let pomoSeconds = 25 * 60;
   let pomoRunning = false;
   let pomoInterval = null;
-  let pomoMode = 'work'; // work | break
+  let pomoMode = 'work';
   const pomoCountKey = 'pomo-' + todayKey();
   let pomoCount = parseInt(localStorage.getItem(pomoCountKey) || '0');
   const pomoTimeEl = document.getElementById('pomoTime');
@@ -731,18 +781,15 @@ const EXCH = {usd: 84.34, eur: 95.87, cny: 12.54};
   // ============ КОНВЕРТЕРЫ ============
   window.convTemp = function(){
     const c = parseFloat(document.getElementById('convC').value);
-    const el = document.getElementById('convF');
-    el.textContent = isNaN(c) ? '°F' : (c * 9 / 5 + 32).toFixed(1) + '°F';
+    document.getElementById('convF').textContent = isNaN(c) ? '°F' : (c * 9 / 5 + 32).toFixed(1) + '°F';
   };
   window.convDist = function(){
     const km = parseFloat(document.getElementById('convKm').value);
-    const el = document.getElementById('convMi');
-    el.textContent = isNaN(km) ? 'миль' : (km * 0.621371).toFixed(2) + ' миль';
+    document.getElementById('convMi').textContent = isNaN(km) ? 'миль' : (km * 0.621371).toFixed(2) + ' миль';
   };
   window.convWeight = function(){
     const kg = parseFloat(document.getElementById('convKg').value);
-    const el = document.getElementById('convLb');
-    el.textContent = isNaN(kg) ? 'фунт' : (kg * 2.20462).toFixed(2) + ' фунт';
+    document.getElementById('convLb').textContent = isNaN(kg) ? 'фунт' : (kg * 2.20462).toFixed(2) + ' фунт';
   };
   window.convMoney = function(){
     const r = parseFloat(document.getElementById('convRub').value);
@@ -790,88 +837,12 @@ const EXCH = {usd: 84.34, eur: 95.87, cny: 12.54};
       const label = days > 0 ? 'через ' + days + ' дн.' : (days < 0 ? Math.abs(days) + ' дн. назад' : 'сегодня 🎉');
       const emoji = days === 0 ? '🎉' : (days > 0 ? '⏳' : '📅');
       return '<div class="date-row">' +
-        '<span class="date-label-txt">' + emoji + ' ' + x.label + '</span>' +
+        '<span class="date-label-txt">' + emoji + ' ' + x.label.replace(/</g,'&lt;') + '</span>' +
         '<span class="date-days">' + label + '</span>' +
         '<button class="date-del" onclick="delDateCounter(' + i + ')">×</button></div>';
     }).join('');
   }
   renderDates();
-
-  // ============ СУДОКУ ============
-  function sudokuSeed() {
-    const d = new Date(); return d.getFullYear() * 10000 + (d.getMonth()+1) * 100 + d.getDate();
-  }
-  function seededRandom(seed) {
-    let s = seed;
-    return function() { s = (s * 9301 + 49297) % 233280; return s / 233280; };
-  }
-  function generateSudoku() {
-    // Простой backtracking
-    const rng = seededRandom(sudokuSeed());
-    const grid = Array.from({length: 9}, () => new Array(9).fill(0));
-    function ok(g, r, c, v) {
-      for (let i = 0; i < 9; i++) { if (g[r][i] === v || g[i][c] === v) return false; }
-      const br = Math.floor(r/3)*3, bc = Math.floor(c/3)*3;
-      for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) if (g[br+i][bc+j] === v) return false;
-      return true;
-    }
-    function solve() {
-      for (let r = 0; r < 9; r++) for (let c = 0; c < 9; c++) {
-        if (grid[r][c] === 0) {
-          const nums = [1,2,3,4,5,6,7,8,9].sort(() => rng() - 0.5);
-          for (const v of nums) {
-            if (ok(grid, r, c, v)) {
-              grid[r][c] = v;
-              if (solve()) return true;
-              grid[r][c] = 0;
-            }
-          }
-          return false;
-        }
-      }
-      return true;
-    }
-    solve();
-    return grid;
-  }
-  const sudokuSol = generateSudoku();
-  const sudokuPuz = sudokuSol.map(row => row.slice());
-  // Убираем ~50% клеток
-  const rng2 = seededRandom(sudokuSeed() + 1);
-  for (let i = 0; i < 50; i++) {
-    const r = Math.floor(rng2() * 9), c = Math.floor(rng2() * 9);
-    sudokuPuz[r][c] = 0;
-  }
-  function renderSudoku(){
-    const el = document.getElementById('sudokuGrid'); if (!el) return;
-    el.innerHTML = '';
-    for (let r = 0; r < 9; r++) for (let c = 0; c < 9; c++) {
-      const v = sudokuPuz[r][c];
-      const inp = document.createElement('input');
-      inp.type = 'text'; inp.maxLength = 1; inp.className = 'sudoku-cell' + (v ? ' given' : '');
-      inp.value = v || '';
-      inp.readOnly = !!v;
-      inp.dataset.r = r; inp.dataset.c = c;
-      inp.addEventListener('input', () => {
-        const val = parseInt(inp.value);
-        if (isNaN(val)) { inp.value = ''; inp.classList.remove('wrong'); return; }
-        if (val === sudokuSol[r][c]) { inp.classList.remove('wrong'); checkSudokuDone(); }
-        else inp.classList.add('wrong');
-      });
-      el.appendChild(inp);
-    }
-  }
-  function checkSudokuDone(){
-    const cells = document.querySelectorAll('.sudoku-cell');
-    let ok = true;
-    cells.forEach(c => {
-      const r = parseInt(c.dataset.r), col = parseInt(c.dataset.c);
-      if (parseInt(c.value) !== sudokuSol[r][col]) ok = false;
-    });
-    const st = document.getElementById('sudokuStatus');
-    if (st) st.textContent = ok ? '🎉 Решено!' : '';
-  }
-  renderSudoku();
 })();
 
 </script>
