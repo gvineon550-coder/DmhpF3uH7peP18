@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-generator.py — MEGA dashboard v2.
-Погода, космос, новости, инструменты, трекеры, самолёты, судоку и многое другое.
+generator.py — MEGA dashboard v3.
+Погода, космос, новости, инструменты, трекеры, самолёты, живая карта МКС.
 """
 import os
 import re
@@ -17,7 +17,7 @@ from math import radians, cos, sin, asin, sqrt
 import requests
 
 DOCS = Path('docs')
-UA = 'Mozilla/5.0 (compatible; Dashboard/2.0)'
+UA = 'Mozilla/5.0 (compatible; Dashboard/3.0)'
 NALCHIK_LAT = 43.4981
 NALCHIK_LON = 43.6189
 NALCHIK_NAME = 'Нальчик'
@@ -113,7 +113,6 @@ def haversine(lat1, lon1, lat2, lon2):
     return round(2 * R * asin(sqrt(a)))
 
 
-# ============ ПОГОДА ============
 def weather_icon(code):
     try: code = int(code)
     except: return '🌡️'
@@ -182,14 +181,12 @@ def golden_hour(weather):
     }
 
 
-# ============ КУРСЫ / КРИПТА ============
 def fetch_currency():
     r = get('https://www.cbr-xml-daily.ru/daily_json.js', json_=True)
     if r:
         try:
             v = r['Valute']
-            return {'usd': round(v['USD']['Value'], 2), 'eur': round(v['EUR']['Value'], 2),
-                    'cny': round(v['CNY']['Value'], 2)}
+            return {'usd': round(v['USD']['Value'], 2), 'eur': round(v['EUR']['Value'], 2), 'cny': round(v['CNY']['Value'], 2)}
         except: pass
     r = get('https://www.cbr.ru/scripts/XML_daily.asp', timeout=15)
     if r:
@@ -218,7 +215,6 @@ def fetch_crypto():
     return out or None
 
 
-# ============ НОВОСТИ ============
 def parse_rss(xml_bytes, source_name, limit=5):
     items = []
     try:
@@ -256,7 +252,6 @@ def fetch_news():
         r = get(url, timeout=12)
         if not r: continue
         all_items.extend(parse_rss(r.content, name, limit=5))
-
     def parse_date(s):
         for fmt in ('%a, %d %b %Y %H:%M:%S %z', '%a, %d %b %Y %H:%M:%S %Z', '%a, %d %b %Y %H:%M:%S'):
             try:
@@ -266,13 +261,11 @@ def fetch_news():
                 return dt
             except: continue
         return datetime.datetime.min
-
     for it in all_items: it['dt'] = parse_date(it['date'])
     all_items.sort(key=lambda x: x['dt'], reverse=True)
     return all_items[:12]
 
 
-# ============ МКС ============
 def fetch_iss():
     r = get('https://api.wheretheiss.at/v1/satellites/25544', json_=True)
     if not r: return None
@@ -286,7 +279,6 @@ def fetch_iss():
     except: return None
 
 
-# ============ Kp-ИНДЕКС ============
 def fetch_kp_index():
     candidates = [
         'https://services.swpc.noaa.gov/json/planetary_k_index_1m.json',
@@ -320,7 +312,6 @@ def kp_to_level(kp):
     return ('Очень сильная G4+', '#dc2626')
 
 
-# ============ ВОЗДУХ / УФ ============
 def fetch_air_quality():
     r = get(f'https://air-quality-api.open-meteo.com/v1/air-quality?latitude={NALCHIK_LAT}&longitude={NALCHIK_LON}&current=pm10,pm2_5,european_aqi,us_aqi', json_=True)
     if not r: return None
@@ -360,7 +351,6 @@ def uv_level(uv):
     return ('Экстремальный', '#dc2626')
 
 
-# ============ ЗЕМЛЕТРЯСЕНИЯ ============
 def fetch_earthquakes():
     url = f'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude={NALCHIK_LAT}&longitude={NALCHIK_LON}&maxradiuskm=1500&limit=5&orderby=time&minmagnitude=3.5'
     r = get(url, json_=True)
@@ -388,41 +378,29 @@ def time_ago_from_ts(ms):
     except: return ''
 
 
-# ============ САМОЛЁТЫ ============
 def fetch_planes():
-    """Самолёты над Нальчиком. Opensky Network, свободный API."""
-    delta = 1.5  # градусов ~ 165 км радиус
+    delta = 1.5
     url = f'https://opensky-network.org/api/states/all?lamin={NALCHIK_LAT-delta}&lomin={NALCHIK_LON-delta}&lamax={NALCHIK_LAT+delta}&lomax={NALCHIK_LON+delta}'
     r = get(url, json_=True, timeout=15)
     if not r: return []
     try:
-        states = r.get('states') or []
         out = []
-        for s in states[:8]:
+        for s in (r.get('states') or [])[:8]:
             try:
                 callsign = (s[1] or '').strip()
                 if not callsign: continue
-                lon, lat = s[5], s[6]
-                alt = s[7] or s[13]
-                speed = s[9]
-                country = s[2]
+                lon, lat = s[5], s[6]; alt = s[7] or s[13]; speed = s[9]; country = s[2]
                 if lat is None or lon is None: continue
-                out.append({
-                    'callsign': callsign,
-                    'country': country,
-                    'alt': round(alt) if alt else 0,
-                    'speed': round(speed * 3.6) if speed else 0,  # м/с → км/ч
-                    'dist': haversine(NALCHIK_LAT, NALCHIK_LON, lat, lon),
-                })
+                out.append({'callsign': callsign, 'country': country,
+                            'alt': round(alt) if alt else 0,
+                            'speed': round(speed * 3.6) if speed else 0,
+                            'dist': haversine(NALCHIK_LAT, NALCHIK_LON, lat, lon)})
             except: continue
         out.sort(key=lambda x: x['dist'])
         return out
-    except Exception as e:
-        log(f"Planes: {e}")
-        return []
+    except: return []
 
 
-# ============ ИСТОРИЯ ДНЯ ============
 def fetch_on_this_day():
     today = datetime.date.today()
     r = get(f'https://api.wikimedia.org/feed/v1/wikipedia/ru/onthisday/selected/{today.month:02d}/{today.day:02d}', json_=True, timeout=10)
@@ -434,26 +412,17 @@ def fetch_on_this_day():
     except: return []
 
 
-# ============ СТАТЬЯ ДНЯ ============
 def fetch_article_of_day():
-    """Случайная интересная статья из Wikipedia RU."""
-    today = datetime.date.today()
-    seed = today.timetuple().tm_yday + today.year * 100
-    random.seed(seed)
-    title = 'Специальная:Random'
     try:
         r = get(f'https://ru.wikipedia.org/api/rest_v1/page/random/summary', json_=True, timeout=10)
         if not r: return None
-        return {
-            'title': r.get('title', ''),
-            'extract': (r.get('extract', '') or '')[:400] + '...',
-            'url': (r.get('content_urls', {}).get('desktop', {}) or {}).get('page', ''),
-            'thumb': (r.get('thumbnail', {}) or {}).get('source', ''),
-        }
+        return {'title': r.get('title', ''),
+                'extract': (r.get('extract', '') or '')[:400] + '...',
+                'url': (r.get('content_urls', {}).get('desktop', {}) or {}).get('page', ''),
+                'thumb': (r.get('thumbnail', {}) or {}).get('source', '')}
     except: return None
 
 
-# ============ ЛУНА / ЦИТАТА ============
 def moon_phase():
     today = datetime.date.today()
     days = (today - datetime.date(2000, 1, 6)).days
@@ -470,8 +439,7 @@ def moon_phase():
 
 def quote_of_day():
     today = datetime.date.today()
-    idx = (today.year * 366 + today.timetuple().tm_yday) % len(QUOTES)
-    return QUOTES[idx]
+    return QUOTES[(today.year * 366 + today.timetuple().tm_yday) % len(QUOTES)]
 
 
 def days_to_new_year():
@@ -496,7 +464,6 @@ def calendar_html(today):
     return f'<div class="cal-month">{MONTHS_NOM[m-1]} {y}</div><div class="cal-grid">{heads}{"".join(cells)}</div>'
 
 
-# ============ АРТ ============
 def generate_svg_art(kind='cloud'):
     random.seed(datetime.datetime.now().strftime('%Y%m%d%H') + kind)
     hour = datetime.datetime.now().hour
@@ -520,7 +487,6 @@ def track_of_day(kind):
     return {'name': name, 'artist': artist, 'url': f'https://www.youtube.com/results?search_query={artist.replace(" ", "+")}+{name.replace(" ", "+")}'}
 
 
-# ============ КОСМОС ============
 def solar_image_url():
     return {'visible': 'https://sdo.gsfc.nasa.gov/assets/img/latest/latest_256_HMIIF.jpg',
             'corona':  'https://sdo.gsfc.nasa.gov/assets/img/latest/latest_256_0171.jpg',
@@ -603,7 +569,6 @@ def fact_of_day():
     return FACTS[(today.year * 366 + today.timetuple().tm_yday) % len(FACTS)]
 
 
-# ============ РЕНДЕР ============
 def time_ago(dt):
     if dt == datetime.datetime.min: return ''
     try:
@@ -778,9 +743,8 @@ def render_article(article):
     return f'<a class="article-card" href="{article["url"]}" target="_blank">{thumb}<div class="article-title">{html.escape(article["title"])}</div><div class="article-desc">{html.escape(article["extract"])}</div><div class="article-source">📖 Wikipedia RU</div></a>'
 
 
-# ============ ГЛАВНАЯ ============
 def generate():
-    log("📄 Генерирую dashboard...")
+    log("📄 Генерирую dashboard v3...")
     DOCS.mkdir(exist_ok=True)
 
     now = datetime.datetime.now(); today = now.date()
@@ -891,7 +855,6 @@ def generate():
   <div class="card card-cat"><h3>🐱 Кот дня</h3>{render_cat(cat)}</div>
 
   <div class="card card-planes"><h3>✈️ Самолёты над Нальчиком</h3>{render_planes(planes)}</div>
-
   <div class="card card-article"><h3>📖 Статья дня</h3>{render_article(article)}</div>
 
   <div class="card card-habits">
@@ -973,10 +936,30 @@ def generate():
     </div>
   </div>
 
-  <div class="card card-sudoku">
-    <h3>🧩 Судоку дня</h3>
-    <div class="sudoku-grid" id="sudokuGrid"></div>
-    <div class="sudoku-status" id="sudokuStatus"></div>
+  <div class="card card-issmap">
+    <h3>🗺 МКС на карте мира</h3>
+    <div class="issmap-wrap">
+      <svg class="issmap" viewBox="0 0 360 180" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+        <rect width="360" height="180" fill="#0a1628"/>
+        <line x1="0" y1="45" x2="360" y2="45" stroke="#1e3a5f" stroke-width="0.5"/>
+        <line x1="0" y1="90" x2="360" y2="90" stroke="#1e3a5f" stroke-width="0.5"/>
+        <line x1="0" y1="135" x2="360" y2="135" stroke="#1e3a5f" stroke-width="0.5"/>
+        <line x1="90" y1="0" x2="90" y2="180" stroke="#1e3a5f" stroke-width="0.5"/>
+        <line x1="180" y1="0" x2="180" y2="180" stroke="#1e3a5f" stroke-width="0.5"/>
+        <line x1="270" y1="0" x2="270" y2="180" stroke="#1e3a5f" stroke-width="0.5"/>
+        <line x1="0" y1="90" x2="360" y2="90" stroke="#60a5fa" stroke-width="0.8" stroke-dasharray="3,3"/>
+        <circle id="issDot2" cx="180" cy="90" r="12" fill="none" stroke="#facc15" stroke-width="1" opacity="0.5">
+          <animate attributeName="r" values="5;15;5" dur="2s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.6;0;0.6" dur="2s" repeatCount="indefinite"/>
+        </circle>
+        <circle id="issDot" cx="180" cy="90" r="5" fill="#facc15" stroke="#fff" stroke-width="1"/>
+        <circle cx="{round((NALCHIK_LON + 180))}" cy="{round(90 - NALCHIK_LAT)}" r="3" fill="#f87171"/>
+      </svg>
+    </div>
+    <div class="issmap-info">
+      <span id="issMapCoords">—</span>
+      <span id="issMapDist">—</span>
+    </div>
   </div>
 
   <div class="card card-sleep">
@@ -1069,14 +1052,14 @@ body.aurora::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:n
 .card-planes{grid-column:span 6}.card-article{grid-column:span 6}
 .card-habits{grid-column:span 4}.card-todo{grid-column:span 4}.card-notes{grid-column:span 4}
 .card-pomo{grid-column:span 3;text-align:center}.card-mood{grid-column:span 3;text-align:center}.card-water{grid-column:span 3;text-align:center}.card-conv{grid-column:span 3}
-.card-tools{grid-column:span 4}.card-dates{grid-column:span 4}.card-sudoku{grid-column:span 4}
+.card-tools{grid-column:span 4}.card-dates{grid-column:span 4}.card-issmap{grid-column:span 4}
 @media(max-width:1000px){
   .card-clock,.card-weather,.card-iss,.card-kp,.card-aq,.card-uv{grid-column:span 6}
   .card-currency,.card-crypto,.card-calendar,.card-art,.card-gh,.card-moon,.card-ny,.card-track{grid-column:span 3}
   .card-news,.card-eq,.card-history,.card-quote{grid-column:span 6}
   .card-solar,.card-apod,.card-asteroids,.card-launch,.card-museum,.card-planes,.card-article{grid-column:span 6}
   .card-cat,.card-sleep,.card-dice,.card-fact{grid-column:span 3}
-  .card-habits,.card-todo,.card-notes,.card-tools,.card-dates,.card-sudoku{grid-column:span 6}
+  .card-habits,.card-todo,.card-notes,.card-tools,.card-dates,.card-issmap{grid-column:span 6}
   .card-pomo,.card-mood,.card-water,.card-conv{grid-column:span 3}
 }
 .clock{font-size:clamp(56px,10vw,88px);font-weight:200;letter-spacing:-0.05em;line-height:0.95;font-variant-numeric:tabular-nums;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
@@ -1196,6 +1179,11 @@ body.aurora::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:n
 .article-desc{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:8px}
 .article-source{font-size:10px;color:var(--muted);opacity:0.7}
 
+/* ISS map */
+.issmap-wrap{width:100%;border-radius:12px;overflow:hidden;background:#0a1628;margin-bottom:10px}
+.issmap{width:100%;height:auto;display:block;aspect-ratio:2/1}
+.issmap-info{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-family:ui-monospace,monospace}
+
 /* Tools */
 .tool-input-row{display:flex;gap:6px;margin-top:10px}
 .tool-input-row input{flex:1;background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:10px;font-size:13px;font-family:inherit}
@@ -1238,14 +1226,6 @@ body.aurora::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:n
 .date-row:last-child{border-bottom:none}
 .date-label-txt{flex:1}.date-days{font-weight:600;color:var(--accent2);font-variant-numeric:tabular-nums}
 .date-del{background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:0 4px}
-.sudoku-grid{display:grid;grid-template-columns:repeat(9,1fr);gap:1px;background:var(--border);border:2px solid var(--accent);border-radius:8px;overflow:hidden;max-width:280px;margin:0 auto}
-.sudoku-cell{aspect-ratio:1;background:var(--panel2);border:none;color:var(--text);font-size:16px;font-weight:500;text-align:center;font-family:inherit;padding:0;cursor:pointer}
-.sudoku-cell:focus{outline:none;background:var(--accent);color:#fff}
-.sudoku-cell.given{color:var(--accent2);font-weight:700;cursor:default}
-.sudoku-cell.wrong{color:var(--bad)}
-.sudoku-cell:nth-child(3n):not(:nth-child(9n)){border-right:2px solid var(--accent)}
-.sudoku-cell:nth-child(n+19):nth-child(-n+27),.sudoku-cell:nth-child(n+46):nth-child(-n+54){border-bottom:2px solid var(--accent)}
-.sudoku-status{text-align:center;font-size:12px;color:var(--muted);margin-top:10px}
 .sleep-block{font-size:12px}
 .sleep-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);color:var(--muted);flex-wrap:wrap;gap:4px}
 .sleep-row:last-of-type{border-bottom:none}
@@ -1281,8 +1261,7 @@ def get_js(weather_kind):
   }}
   tick(); setInterval(tick, 1000);
   function counters(){{
-    const now = new Date();
-    const msk = new Date(now.toLocaleString('en-US', {{timeZone:'Europe/Moscow'}}));
+    const msk = new Date(new Date().toLocaleString('en-US', {{timeZone:'Europe/Moscow'}}));
     const daySec = msk.getHours()*3600 + msk.getMinutes()*60 + msk.getSeconds();
     document.getElementById('cnt-day').textContent = daySec.toLocaleString('ru-RU');
     const start = new Date(msk.getFullYear(), 0, 1);
@@ -1371,7 +1350,6 @@ def get_js(weather_kind):
     }}
     draw();
   }}
-  // Фаза сна
   function sleepCalc(){{
     const msk = new Date(new Date().toLocaleString('en-US', {{timeZone:'Europe/Moscow'}}));
     [6, 7, 8].forEach(target => {{
@@ -1384,7 +1362,6 @@ def get_js(weather_kind):
     }});
   }}
   sleepCalc(); setInterval(sleepCalc, 60000);
-  // Кубик / монетка
   window.rollDice = function(){{
     const el = document.getElementById('diceResult'); if (!el) return;
     el.classList.add('rolling');
@@ -1398,6 +1375,44 @@ def get_js(weather_kind):
     let n = 0;
     const iv = setInterval(() => {{ el.textContent = Math.random() < 0.5 ? '🪙 Орёл' : '🪙 Решка'; n++; if (n > 8) {{ clearInterval(iv); el.classList.remove('rolling'); }} }}, 80);
   }};
+
+  // ============ КАРТА МКС (LIVE) ============
+  let issLat = 0, issLon = 0;
+  function updateIssMap(){{
+    const dot = document.getElementById('issDot');
+    const dot2 = document.getElementById('issDot2');
+    if (!dot) return;
+    const x = issLon + 180;
+    const y = 90 - issLat;
+    dot.setAttribute('cx', x);
+    dot.setAttribute('cy', y);
+    if (dot2) {{
+      dot2.setAttribute('cx', x);
+      dot2.setAttribute('cy', y);
+    }}
+    const coordsEl = document.getElementById('issMapCoords');
+    if (coordsEl) coordsEl.textContent = issLat.toFixed(1) + '°, ' + issLon.toFixed(1) + '°';
+    const lat1 = 43.4981, lon1 = 43.6189;
+    const R = 6371;
+    const dLat = (issLat - lat1) * Math.PI / 180;
+    const dLon = (issLon - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(issLat*Math.PI/180) * Math.sin(dLon/2)**2;
+    const dist = Math.round(2 * R * Math.asin(Math.sqrt(a)));
+    const distEl = document.getElementById('issMapDist');
+    if (distEl) distEl.textContent = dist.toLocaleString('ru-RU') + ' км до Нальчика';
+  }}
+  async function fetchIssLive(){{
+    try {{
+      const r = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
+      if (!r.ok) return;
+      const d = await r.json();
+      issLat = d.latitude;
+      issLon = d.longitude;
+      updateIssMap();
+    }} catch(e){{}}
+  }}
+  fetchIssLive();
+  setInterval(fetchIssLive, 5000);
 
   // ============ ПРИВЫЧКИ ============
   function todayKey() {{ const d = new Date(); return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate(); }}
@@ -1413,7 +1428,6 @@ def get_js(weather_kind):
     const h = loadHabits(); const key = todayKey();
     const idx = h[i].dates.indexOf(key);
     if (idx >= 0) h[i].dates.splice(idx, 1); else h[i].dates.push(key);
-    // Пересчёт streak
     let streak = 0; let d = new Date();
     while (true) {{
       const k = d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
@@ -1432,7 +1446,7 @@ def get_js(weather_kind):
       const streak = x.streak || 0;
       return '<div class="habit-row">' +
         '<div class="habit-check ' + (done ? 'done' : '') + '" onclick="toggleHabit(' + i + ')">' + (done ? '✓' : '') + '</div>' +
-        '<span class="habit-name ' + (done ? 'done' : '') + '" onclick="toggleHabit(' + i + ')">' + x.name + '</span>' +
+        '<span class="habit-name ' + (done ? 'done' : '') + '" onclick="toggleHabit(' + i + ')">' + x.name.replace(/</g,'&lt;') + '</span>' +
         (streak > 1 ? '<span class="habit-streak">🔥' + streak + '</span>' : '') +
         '<button class="habit-del" onclick="delHabit(' + i + ')">×</button></div>';
     }}).join('');
@@ -1483,7 +1497,7 @@ def get_js(weather_kind):
   let pomoSeconds = 25 * 60;
   let pomoRunning = false;
   let pomoInterval = null;
-  let pomoMode = 'work'; // work | break
+  let pomoMode = 'work';
   const pomoCountKey = 'pomo-' + todayKey();
   let pomoCount = parseInt(localStorage.getItem(pomoCountKey) || '0');
   const pomoTimeEl = document.getElementById('pomoTime');
@@ -1567,18 +1581,15 @@ def get_js(weather_kind):
   // ============ КОНВЕРТЕРЫ ============
   window.convTemp = function(){{
     const c = parseFloat(document.getElementById('convC').value);
-    const el = document.getElementById('convF');
-    el.textContent = isNaN(c) ? '°F' : (c * 9 / 5 + 32).toFixed(1) + '°F';
+    document.getElementById('convF').textContent = isNaN(c) ? '°F' : (c * 9 / 5 + 32).toFixed(1) + '°F';
   }};
   window.convDist = function(){{
     const km = parseFloat(document.getElementById('convKm').value);
-    const el = document.getElementById('convMi');
-    el.textContent = isNaN(km) ? 'миль' : (km * 0.621371).toFixed(2) + ' миль';
+    document.getElementById('convMi').textContent = isNaN(km) ? 'миль' : (km * 0.621371).toFixed(2) + ' миль';
   }};
   window.convWeight = function(){{
     const kg = parseFloat(document.getElementById('convKg').value);
-    const el = document.getElementById('convLb');
-    el.textContent = isNaN(kg) ? 'фунт' : (kg * 2.20462).toFixed(2) + ' фунт';
+    document.getElementById('convLb').textContent = isNaN(kg) ? 'фунт' : (kg * 2.20462).toFixed(2) + ' фунт';
   }};
   window.convMoney = function(){{
     const r = parseFloat(document.getElementById('convRub').value);
@@ -1626,88 +1637,12 @@ def get_js(weather_kind):
       const label = days > 0 ? 'через ' + days + ' дн.' : (days < 0 ? Math.abs(days) + ' дн. назад' : 'сегодня 🎉');
       const emoji = days === 0 ? '🎉' : (days > 0 ? '⏳' : '📅');
       return '<div class="date-row">' +
-        '<span class="date-label-txt">' + emoji + ' ' + x.label + '</span>' +
+        '<span class="date-label-txt">' + emoji + ' ' + x.label.replace(/</g,'&lt;') + '</span>' +
         '<span class="date-days">' + label + '</span>' +
         '<button class="date-del" onclick="delDateCounter(' + i + ')">×</button></div>';
     }}).join('');
   }}
   renderDates();
-
-  // ============ СУДОКУ ============
-  function sudokuSeed() {{
-    const d = new Date(); return d.getFullYear() * 10000 + (d.getMonth()+1) * 100 + d.getDate();
-  }}
-  function seededRandom(seed) {{
-    let s = seed;
-    return function() {{ s = (s * 9301 + 49297) % 233280; return s / 233280; }};
-  }}
-  function generateSudoku() {{
-    // Простой backtracking
-    const rng = seededRandom(sudokuSeed());
-    const grid = Array.from({{length: 9}}, () => new Array(9).fill(0));
-    function ok(g, r, c, v) {{
-      for (let i = 0; i < 9; i++) {{ if (g[r][i] === v || g[i][c] === v) return false; }}
-      const br = Math.floor(r/3)*3, bc = Math.floor(c/3)*3;
-      for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) if (g[br+i][bc+j] === v) return false;
-      return true;
-    }}
-    function solve() {{
-      for (let r = 0; r < 9; r++) for (let c = 0; c < 9; c++) {{
-        if (grid[r][c] === 0) {{
-          const nums = [1,2,3,4,5,6,7,8,9].sort(() => rng() - 0.5);
-          for (const v of nums) {{
-            if (ok(grid, r, c, v)) {{
-              grid[r][c] = v;
-              if (solve()) return true;
-              grid[r][c] = 0;
-            }}
-          }}
-          return false;
-        }}
-      }}
-      return true;
-    }}
-    solve();
-    return grid;
-  }}
-  const sudokuSol = generateSudoku();
-  const sudokuPuz = sudokuSol.map(row => row.slice());
-  // Убираем ~50% клеток
-  const rng2 = seededRandom(sudokuSeed() + 1);
-  for (let i = 0; i < 50; i++) {{
-    const r = Math.floor(rng2() * 9), c = Math.floor(rng2() * 9);
-    sudokuPuz[r][c] = 0;
-  }}
-  function renderSudoku(){{
-    const el = document.getElementById('sudokuGrid'); if (!el) return;
-    el.innerHTML = '';
-    for (let r = 0; r < 9; r++) for (let c = 0; c < 9; c++) {{
-      const v = sudokuPuz[r][c];
-      const inp = document.createElement('input');
-      inp.type = 'text'; inp.maxLength = 1; inp.className = 'sudoku-cell' + (v ? ' given' : '');
-      inp.value = v || '';
-      inp.readOnly = !!v;
-      inp.dataset.r = r; inp.dataset.c = c;
-      inp.addEventListener('input', () => {{
-        const val = parseInt(inp.value);
-        if (isNaN(val)) {{ inp.value = ''; inp.classList.remove('wrong'); return; }}
-        if (val === sudokuSol[r][c]) {{ inp.classList.remove('wrong'); checkSudokuDone(); }}
-        else inp.classList.add('wrong');
-      }});
-      el.appendChild(inp);
-    }}
-  }}
-  function checkSudokuDone(){{
-    const cells = document.querySelectorAll('.sudoku-cell');
-    let ok = true;
-    cells.forEach(c => {{
-      const r = parseInt(c.dataset.r), col = parseInt(c.dataset.c);
-      if (parseInt(c.value) !== sudokuSol[r][col]) ok = false;
-    }});
-    const st = document.getElementById('sudokuStatus');
-    if (st) st.textContent = ok ? '🎉 Решено!' : '';
-  }}
-  renderSudoku();
 }})();
 '''
 
