@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-generator.py — MEGA dashboard v4.
-Погода, космос, новости, инструменты, трекеры, самолёты, живая карта МКС,
-инфо-блок, бэкап/восстановление, мини-радио, трекер сна.
+generator.py — MEGA dashboard v4.1.
 """
 import os
 import re
@@ -18,7 +16,7 @@ from math import radians, cos, sin, asin, sqrt
 import requests
 
 DOCS = Path('docs')
-UA = 'Mozilla/5.0 (compatible; Dashboard/4.0)'
+UA = 'Mozilla/5.0 (compatible; Dashboard/4.1)'
 NALCHIK_LAT = 43.4981
 NALCHIK_LON = 43.6189
 NALCHIK_NAME = 'Нальчик'
@@ -415,7 +413,7 @@ def fetch_on_this_day():
 
 def fetch_article_of_day():
     try:
-        r = get(f'https://ru.wikipedia.org/api/rest_v1/page/random/summary', json_=True, timeout=10)
+        r = get('https://ru.wikipedia.org/api/rest_v1/page/random/summary', json_=True, timeout=10)
         if not r: return None
         return {'title': r.get('title', ''),
                 'extract': (r.get('extract', '') or '')[:400] + '...',
@@ -745,7 +743,7 @@ def render_article(article):
 
 
 def generate():
-    log("📄 Генерирую dashboard v4...")
+    log("📄 Генерирую dashboard v4.1...")
     DOCS.mkdir(exist_ok=True)
 
     now = datetime.datetime.now(); today = now.date()
@@ -854,7 +852,6 @@ def generate():
       <summary>🔒 Приватность — что важно знать</summary>
       <p><b>Все твои данные хранятся только в браузере</b> (localStorage). Никто — ни автор сайта, ни GitHub — не видит твои заметки, привычки, задачи.</p>
       <p><b>Важно:</b> если очистишь кэш Chrome — данные пропадут. Сделай бэкап!</p>
-      <p>Все публичные данные (погода, курсы, новости) берутся из открытых API. Ничего личного не уходит.</p>
     </details>
     <details>
       <summary>🌐 Источники данных</summary>
@@ -932,7 +929,7 @@ def generate():
 
   <div class="card card-backup">
     <h3>💾 Бэкап данных</h3>
-    <p class="backup-note">Скачай все свои данные (привычки, задачи, заметки, даты) в один файл. Восстановишь позже или перенесёшь на другое устройство.</p>
+    <p class="backup-note">Скачай все свои данные (привычки, задачи, заметки, даты) в один файл.</p>
     <button class="dice-btn" style="width:100%;margin-bottom:8px" onclick="backupData()">📥 Скачать JSON</button>
     <button class="dice-btn" style="width:100%;margin-bottom:8px" onclick="document.getElementById('restoreInput').click()">📤 Восстановить из файла</button>
     <input type="file" id="restoreInput" accept=".json" style="display:none" onchange="restoreData(event)">
@@ -1350,11 +1347,10 @@ body.aurora::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:n
 
 
 def get_js(weather_kind):
-    return f'''
-(function(){{
-  function tick(){{
+    js = r'''(function(){
+  function tick(){
     const now = new Date();
-    const msk = new Date(now.toLocaleString('en-US', {{timeZone:'Europe/Moscow'}}));
+    const msk = new Date(now.toLocaleString('en-US', {timeZone:'Europe/Moscow'}));
     const hh = String(msk.getHours()).padStart(2, '0');
     const mm = String(msk.getMinutes()).padStart(2, '0');
     const ss = String(msk.getSeconds()).padStart(2, '0');
@@ -1363,59 +1359,59 @@ def get_js(weather_kind):
     document.getElementById('m1').textContent = mm[0];
     document.getElementById('m2').textContent = mm[1];
     document.getElementById('ss').textContent = ss;
-  }}
+  }
   tick(); setInterval(tick, 1000);
-  function counters(){{
-    const msk = new Date(new Date().toLocaleString('en-US', {{timeZone:'Europe/Moscow'}}));
+  function counters(){
+    const msk = new Date(new Date().toLocaleString('en-US', {timeZone:'Europe/Moscow'}));
     const daySec = msk.getHours()*3600 + msk.getMinutes()*60 + msk.getSeconds();
     document.getElementById('cnt-day').textContent = daySec.toLocaleString('ru-RU');
     const start = new Date(msk.getFullYear(), 0, 1);
     document.getElementById('cnt-year').textContent = Math.floor((msk - start) / 86400000).toLocaleString('ru-RU');
     const end = new Date(msk.getFullYear(), 11, 31);
     document.getElementById('cnt-left').textContent = Math.floor((end - msk) / 86400000) + 1;
-  }}
+  }
   counters(); setInterval(counters, 1000);
   let saved = localStorage.getItem('theme') || 'dark';
   if (!['dark','light'].includes(saved)) saved = 'dark';
   document.documentElement.setAttribute('data-theme', saved);
   const btn = document.getElementById('themeBtn');
-  btn.textContent = saved === 'dark' ? '☀' : '🌙';
-  btn.addEventListener('click', function(){{
+  btn.textContent = saved === 'dark' ? '\u2600' : '\u{1F319}';
+  btn.addEventListener('click', function(){
     const cur = document.documentElement.getAttribute('data-theme') || 'dark';
     const nxt = cur === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', nxt);
     localStorage.setItem('theme', nxt);
-    btn.textContent = nxt === 'dark' ? '☀' : '🌙';
-  }});
+    btn.textContent = nxt === 'dark' ? '\u2600' : '\u{1F319}';
+  });
   let soundOn = localStorage.getItem('clockSound') === 'on';
   const sBtn = document.getElementById('soundBtn');
-  sBtn.textContent = soundOn ? '🔊' : '🔇';
+  sBtn.textContent = soundOn ? '\u{1F50A}' : '\u{1F507}';
   let audioCtx = null;
-  function beep(){{
-    if (!audioCtx) {{ try {{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }} catch(e){{ return; }} }}
+  function beep(){
+    if (!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){ return; } }
     const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
     osc.frequency.value = 880; osc.type = 'sine';
     gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
     osc.connect(gain).connect(audioCtx.destination);
     osc.start(); osc.stop(audioCtx.currentTime + 0.06);
-  }}
-  sBtn.addEventListener('click', function(){{
+  }
+  sBtn.addEventListener('click', function(){
     soundOn = !soundOn;
     localStorage.setItem('clockSound', soundOn ? 'on' : 'off');
-    sBtn.textContent = soundOn ? '🔊' : '🔇';
-  }});
-  setInterval(() => {{ if(soundOn) beep(); }}, 1000);
-  const kind = '{weather_kind}';
+    sBtn.textContent = soundOn ? '\u{1F50A}' : '\u{1F507}';
+  });
+  setInterval(() => { if(soundOn) beep(); }, 1000);
+  const kind = '__KIND__';
   const canvas = document.getElementById('bgCanvas');
-  if(canvas){{
+  if(canvas){
     const ctx = canvas.getContext('2d');
     let W, H, particles = [];
-    function resize(){{
+    function resize(){
       W = canvas.width = window.innerWidth * devicePixelRatio;
       H = canvas.height = window.innerHeight * devicePixelRatio;
       canvas.style.width = window.innerWidth + 'px'; canvas.style.height = window.innerHeight + 'px';
-    }}
+    }
     resize(); window.addEventListener('resize', resize);
     let count = 0;
     if(kind === 'rain' || kind === 'storm') count = 110;
@@ -1423,65 +1419,65 @@ def get_js(weather_kind):
     else if(kind === 'sun') count = 45;
     else if(kind === 'fog') count = 30;
     else count = 25;
-    for(let i = 0; i < count; i++){{
-      particles.push({{x: Math.random() * W, y: Math.random() * H,
+    for(let i = 0; i < count; i++){
+      particles.push({x: Math.random() * W, y: Math.random() * H,
         vx: kind === 'rain' ? 0.5 : (Math.random() - 0.5) * 0.6,
         vy: kind === 'rain' ? 4 + Math.random() * 6 : kind === 'snow' ? 0.4 + Math.random() * 1 : (Math.random() - 0.5) * 0.5,
         r: kind === 'rain' ? 1 + Math.random() * 1.5 : kind === 'snow' ? 2 + Math.random() * 3 : 1 + Math.random() * 2.5,
-        a: 0.15 + Math.random() * 0.5}});
-    }}
-    function draw(){{
+        a: 0.15 + Math.random() * 0.5});
+    }
+    function draw(){
       ctx.clearRect(0, 0, W, H);
-      for(const p of particles){{
-        if(kind === 'rain' || kind === 'storm'){{
+      for(const p of particles){
+        if(kind === 'rain' || kind === 'storm'){
           ctx.strokeStyle = 'rgba(150,200,255,' + p.a + ')'; ctx.lineWidth = p.r;
           ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x + p.vx * 3, p.y + 20 + p.vy * 2); ctx.stroke();
-        }} else if(kind === 'snow'){{
+        } else if(kind === 'snow'){
           ctx.fillStyle = 'rgba(255,255,255,' + p.a + ')';
           ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
-        }} else if(kind === 'sun'){{
+        } else if(kind === 'sun'){
           ctx.fillStyle = 'rgba(255,220,120,' + (p.a * 0.8) + ')';
           ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
-        }} else {{
+        } else {
           ctx.fillStyle = 'rgba(200,220,255,' + (p.a * 0.6) + ')';
           ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
-        }}
+        }
         p.x += p.vx; p.y += p.vy;
-        if(p.y > H + 20){{ p.y = -20; p.x = Math.random() * W; }}
+        if(p.y > H + 20){ p.y = -20; p.x = Math.random() * W; }
         if(p.x > W + 20) p.x = -20;
         if(p.x < -20) p.x = W + 20;
-      }}
+      }
       requestAnimationFrame(draw);
-    }}
+    }
     draw();
-  }}
-  function sleepCalc(){{
-    const msk = new Date(new Date().toLocaleString('en-US', {{timeZone:'Europe/Moscow'}}));
-    [6, 7, 8].forEach(target => {{
+  }
+  function sleepCalc(){
+    const msk = new Date(new Date().toLocaleString('en-US', {timeZone:'Europe/Moscow'}));
+    [6, 7, 8].forEach(target => {
       const wake = new Date(msk); wake.setHours(target, 0, 0, 0);
       if (wake <= msk) wake.setDate(wake.getDate() + 1);
       const sleepMs = wake.getTime() - (15 * 60 * 1000) - (5 * 90 * 60 * 1000);
       const s = new Date(sleepMs);
       const el = document.getElementById('sleep-' + target);
       if (el) el.textContent = String(s.getHours()).padStart(2, '0') + ':' + String(s.getMinutes()).padStart(2, '0');
-    }});
-  }}
+    });
+  }
   sleepCalc(); setInterval(sleepCalc, 60000);
-  window.rollDice = function(){{
+  window.rollDice = function(){
     const el = document.getElementById('diceResult'); if (!el) return;
     el.classList.add('rolling');
-    const faces = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+    const faces = ['\u2680','\u2681','\u2682','\u2683','\u2684','\u2685'];
     let n = 0;
-    const iv = setInterval(() => {{ el.textContent = faces[Math.floor(Math.random() * 6)]; n++; if (n > 10) {{ clearInterval(iv); el.classList.remove('rolling'); }} }}, 60);
-  }};
-  window.flipCoin = function(){{
+    const iv = setInterval(() => { el.textContent = faces[Math.floor(Math.random() * 6)]; n++; if (n > 10) { clearInterval(iv); el.classList.remove('rolling'); } }, 60);
+  };
+  window.flipCoin = function(){
     const el = document.getElementById('diceResult'); if (!el) return;
     el.classList.add('rolling');
     let n = 0;
-    const iv = setInterval(() => {{ el.textContent = Math.random() < 0.5 ? '🪙 Орёл' : '🪙 Решка'; n++; if (n > 8) {{ clearInterval(iv); el.classList.remove('rolling'); }} }}, 80);
-  }};
+    const iv = setInterval(() => { el.textContent = Math.random() < 0.5 ? '\u{1FA99} Орёл' : '\u{1FA99} Решка'; n++; if (n > 8) { clearInterval(iv); el.classList.remove('rolling'); } }, 80);
+  };
   let issLat = 0, issLon = 0;
-  function updateIssMap(){{
+  function updateIssMap(){
     const dot = document.getElementById('issDot');
     const dot2 = document.getElementById('issDot2');
     if (!dot) return;
@@ -1489,7 +1485,7 @@ def get_js(weather_kind):
     const y = 90 - issLat;
     dot.setAttribute('cx', x);
     dot.setAttribute('cy', y);
-    if (dot2) {{ dot2.setAttribute('cx', x); dot2.setAttribute('cy', y); }}
+    if (dot2) { dot2.setAttribute('cx', x); dot2.setAttribute('cy', y); }
     const coordsEl = document.getElementById('issMapCoords');
     if (coordsEl) coordsEl.textContent = issLat.toFixed(1) + '°, ' + issLon.toFixed(1) + '°';
     const lat1 = 43.4981, lon1 = 43.6189;
@@ -1500,21 +1496,20 @@ def get_js(weather_kind):
     const dist = Math.round(2 * R * Math.asin(Math.sqrt(a)));
     const distEl = document.getElementById('issMapDist');
     if (distEl) distEl.textContent = dist.toLocaleString('ru-RU') + ' км до Нальчика';
-  }}
-  async function fetchIssLive(){{
-    try {{
+  }
+  async function fetchIssLive(){
+    try {
       const r = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
       if (!r.ok) return;
       const d = await r.json();
       issLat = d.latitude; issLon = d.longitude;
       updateIssMap();
-    }} catch(e){{}}
-  }}
+    } catch(e){}
+  }
   fetchIssLive();
   setInterval(fetchIssLive, 5000);
 
-  // ============ МИНИ-РАДИО ============
-  window.playRadio = function(url, name){{
+  window.playRadio = function(url, name){
     const audio = document.getElementById('radioAudio');
     const player = document.getElementById('radioPlayer');
     const now = document.getElementById('radioNow');
@@ -1522,93 +1517,91 @@ def get_js(weather_kind):
     audio.src = url;
     audio.play().catch(e => alert('Не удалось включить: ' + e.message));
     if (player) player.style.display = 'block';
-    if (now) now.textContent = '🎵 ' + name;
-  }};
-  window.stopRadio = function(){{
+    if (now) now.textContent = '\u{1F3B5} ' + name;
+  };
+  window.stopRadio = function(){
     const audio = document.getElementById('radioAudio');
     const player = document.getElementById('radioPlayer');
-    if (audio){{ audio.pause(); audio.src = ''; }}
+    if (audio){ audio.pause(); audio.src = ''; }
     if (player) player.style.display = 'none';
-  }};
+  };
 
-  // ============ ТРЕКЕР СНА ============
-  function loadSleep(){{
-    try {{ return JSON.parse(localStorage.getItem('sleep') || '{{}}'); }} catch(e){{ return {{}}; }}
-  }}
-  function saveSleepData(d){{ localStorage.setItem('sleep', JSON.stringify(d)); }}
-  window.saveSleep = function(){{
+  function loadSleep(){
+    try { return JSON.parse(localStorage.getItem('sleep') || '{}'); } catch(e){ return {}; }
+  }
+  function saveSleepData(d){ localStorage.setItem('sleep', JSON.stringify(d)); }
+  window.saveSleep = function(){
     const inEl = document.getElementById('sleepIn');
     const outEl = document.getElementById('sleepOut');
     if (!inEl || !outEl) return;
     const d = loadSleep();
     const today = new Date();
     const key = today.getFullYear() + '-' + (today.getMonth()+1) + '-' + today.getDate();
-    d[key] = {{ in: inEl.value, out: outEl.value }};
+    d[key] = { in: inEl.value, out: outEl.value };
     saveSleepData(d);
     renderSleep();
-  }};
-  function calcHours(inT, outT){{
+  };
+  function calcHours(inT, outT){
     if (!inT || !outT) return 0;
-    const [ih, im] = inT.split(':').map(Number);
-    const [oh, om] = outT.split(':').map(Number);
-    let mins = (oh * 60 + om) - (ih * 60 + im);
+    const p1 = inT.split(':').map(Number);
+    const p2 = outT.split(':').map(Number);
+    let mins = (p2[0] * 60 + p2[1]) - (p1[0] * 60 + p1[1]);
     if (mins < 0) mins += 24 * 60;
     return mins / 60;
-  }}
-  function renderSleep(){{
+  }
+  function renderSleep(){
     const d = loadSleep();
     const today = new Date();
     const key = today.getFullYear() + '-' + (today.getMonth()+1) + '-' + today.getDate();
     const inEl = document.getElementById('sleepIn');
     const outEl = document.getElementById('sleepOut');
-    if (d[key]){{
+    if (d[key]){
       if (inEl) inEl.value = d[key].in;
       if (outEl) outEl.value = d[key].out;
-    }}
+    }
     const hrs = calcHours(inEl ? inEl.value : '23:00', outEl ? outEl.value : '07:00');
     const resEl = document.getElementById('sleepResult');
-    if (resEl){{
+    if (resEl){
       const h = Math.floor(hrs);
       const m = Math.round((hrs - h) * 60);
       const color = hrs >= 7 ? 'var(--good)' : (hrs >= 6 ? 'var(--warn)' : 'var(--bad)');
       resEl.innerHTML = '<span style="color:' + color + '">' + h + 'ч ' + m + 'м</span>';
-    }}
+    }
     const weekEl = document.getElementById('sleepWeek');
-    if (weekEl){{
+    if (weekEl){
       const days = [];
-      for (let i = 6; i >= 0; i--){{
+      for (let i = 6; i >= 0; i--){
         const dt = new Date(); dt.setDate(dt.getDate() - i);
         const k = dt.getFullYear() + '-' + (dt.getMonth()+1) + '-' + dt.getDate();
         const entry = d[k];
         const h = entry ? calcHours(entry.in, entry.out) : 0;
-        days.push({{ key: k, hours: h }});
-      }}
+        days.push({ key: k, hours: h });
+      }
       const maxH = 10;
-      const bars = days.map(x => {{
+      const bars = days.map(x => {
         const pct = Math.min(100, (x.hours / maxH) * 100);
         const title = x.hours > 0 ? x.hours.toFixed(1) + 'ч' : '—';
         return '<div class="sleeptrack-bar" style="height:' + pct + '%" title="' + title + '"></div>';
-      }}).join('');
+      }).join('');
       weekEl.innerHTML = bars;
-    }}
-  }}
+    }
+  }
   renderSleep();
 
-  // ============ БЭКАП / ВОССТАНОВЛЕНИЕ ============
   const BACKUP_KEYS = ['habits', 'todo', 'notes', 'dates', 'theme', 'clockSound', 'sleep'];
-  window.backupData = function(){{
-    const data = {{ version: 4, exported: new Date().toISOString(), data: {{}} }};
-    BACKUP_KEYS.forEach(k => {{
+  window.backupData = function(){
+    const data = { version: 4, exported: new Date().toISOString(), data: {} };
+    BACKUP_KEYS.forEach(k => {
       const v = localStorage.getItem(k);
       if (v !== null) data.data[k] = v;
-    }});
-    for (let i = 0; i < localStorage.length; i++){{
+    });
+    for (let i = 0; i < localStorage.length; i++){
       const k = localStorage.key(i);
       if (k && (k.startsWith('mood-') || k.startsWith('water-') || k.startsWith('pomo-'))){
         data.data[k] = localStorage.getItem(k);
-      }}
-    }}
-    const blob = new Blob([JSON.stringify(data, null, 2)], {{type: 'application/json'}});
+      }
+    }
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -1616,123 +1609,119 @@ def get_js(weather_kind):
     a.click();
     URL.revokeObjectURL(url);
     const st = document.getElementById('backupStatus');
-    if (st){{ st.textContent = '✓ Скачано'; setTimeout(() => st.textContent = '', 3000); }}
-  }};
-  window.restoreData = function(ev){{
+    if (st){ st.textContent = '✓ Скачано'; setTimeout(() => st.textContent = '', 3000); }
+  };
+  window.restoreData = function(ev){
     const file = ev.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = (e) => {{
-      try {{
+    reader.onload = (e) => {
+      try {
         const parsed = JSON.parse(e.target.result);
-        if (!parsed.data) {{ throw new Error('Неверный формат'); }}
+        if (!parsed.data) { throw new Error('Неверный формат'); }
         let restored = 0;
-        Object.entries(parsed.data).forEach(([k, v]) => {{
+        Object.entries(parsed.data).forEach(([k, v]) => {
           localStorage.setItem(k, v);
           restored++;
-        }});
+        });
         const st = document.getElementById('backupStatus');
-        if (st){{ st.textContent = '✓ Восстановлено: ' + restored + ' ключей. Обнови страницу.'; setTimeout(() => location.reload(), 1500); }}
-      }} catch (err) {{
+        if (st){ st.textContent = '✓ Восстановлено: ' + restored + ' ключей. Обнови страницу.'; setTimeout(() => location.reload(), 1500); }
+      } catch (err) {
         const st = document.getElementById('backupStatus');
-        if (st){{ st.textContent = '❌ Ошибка: ' + err.message; }}
-      }}
-    }};
+        if (st){ st.textContent = '❌ Ошибка: ' + err.message; }
+      }
+    };
     reader.readAsText(file);
     ev.target.value = '';
-  }};
-  window.clearAllData = function(){{
+  };
+  window.clearAllData = function(){
     if (!confirm('Точно удалить ВСЕ данные? Это необратимо!')) return;
     const toDelete = [];
-    for (let i = 0; i < localStorage.length; i++){{
+    for (let i = 0; i < localStorage.length; i++){
       const k = localStorage.key(i);
       if (k && (k.startsWith('mood-') || k.startsWith('water-') || k.startsWith('pomo-'))) toDelete.push(k);
-    }}
-    BACKUP_KEYS.forEach(k => {{ if (localStorage.getItem(k) !== null) toDelete.push(k); }});
+    }
+    BACKUP_KEYS.forEach(k => { if (localStorage.getItem(k) !== null) toDelete.push(k); });
     toDelete.forEach(k => localStorage.removeItem(k));
     location.reload();
-  }};
+  };
 
-  // ============ ПРИВЫЧКИ ============
-  function todayKey() {{ const d = new Date(); return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate(); }}
-  function loadHabits() {{ try {{ return JSON.parse(localStorage.getItem('habits') || '[]'); }} catch(e) {{ return []; }} }}
-  function saveHabits(h) {{ localStorage.setItem('habits', JSON.stringify(h)); }}
-  window.addHabit = function(){{
+  function todayKey(){ const d = new Date(); return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate(); }
+  function loadHabits(){ try { return JSON.parse(localStorage.getItem('habits') || '[]'); } catch(e) { return []; } }
+  function saveHabits(h){ localStorage.setItem('habits', JSON.stringify(h)); }
+  window.addHabit = function(){
     const inp = document.getElementById('habitInput');
     const name = inp.value.trim(); if (!name) return;
-    const h = loadHabits(); h.push({{name: name, dates: [], streak: 0}});
+    const h = loadHabits(); h.push({name: name, dates: [], streak: 0});
     saveHabits(h); inp.value = ''; renderHabits();
-  }};
-  window.toggleHabit = function(i){{
+  };
+  window.toggleHabit = function(i){
     const h = loadHabits(); const key = todayKey();
     const idx = h[i].dates.indexOf(key);
     if (idx >= 0) h[i].dates.splice(idx, 1); else h[i].dates.push(key);
     let streak = 0; let d = new Date();
-    while (true) {{
+    while (true) {
       const k = d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
-      if (h[i].dates.includes(k)) {{ streak++; d.setDate(d.getDate() - 1); }} else break;
-    }}
+      if (h[i].dates.includes(k)) { streak++; d.setDate(d.getDate() - 1); } else break;
+    }
     h[i].streak = streak;
     saveHabits(h); renderHabits();
-  }};
-  window.delHabit = function(i){{ const h = loadHabits(); h.splice(i, 1); saveHabits(h); renderHabits(); }};
-  function renderHabits(){{
+  };
+  window.delHabit = function(i){ const h = loadHabits(); h.splice(i, 1); saveHabits(h); renderHabits(); };
+  function renderHabits(){
     const el = document.getElementById('habits'); if (!el) return;
     const h = loadHabits(); const key = todayKey();
-    if (!h.length) {{ el.innerHTML = '<div class="empty">Пока нет привычек</div>'; return; }}
-    el.innerHTML = h.map((x, i) => {{
+    if (!h.length) { el.innerHTML = '<div class="empty">Пока нет привычек</div>'; return; }
+    el.innerHTML = h.map((x, i) => {
       const done = x.dates.includes(key);
       const streak = x.streak || 0;
       return '<div class="habit-row">' +
         '<div class="habit-check ' + (done ? 'done' : '') + '" onclick="toggleHabit(' + i + ')">' + (done ? '✓' : '') + '</div>' +
         '<span class="habit-name ' + (done ? 'done' : '') + '" onclick="toggleHabit(' + i + ')">' + x.name.replace(/</g,'&lt;') + '</span>' +
-        (streak > 1 ? '<span class="habit-streak">🔥' + streak + '</span>' : '') +
+        (streak > 1 ? '<span class="habit-streak">\u{1F525}' + streak + '</span>' : '') +
         '<button class="habit-del" onclick="delHabit(' + i + ')">×</button></div>';
-    }}).join('');
-  }}
+    }).join('');
+  }
   renderHabits();
 
-  // ============ TODO ============
-  function loadTodo() {{ try {{ return JSON.parse(localStorage.getItem('todo') || '[]'); }} catch(e) {{ return []; }} }}
-  function saveTodo(t) {{ localStorage.setItem('todo', JSON.stringify(t)); }}
-  window.addTodo = function(){{
+  function loadTodo(){ try { return JSON.parse(localStorage.getItem('todo') || '[]'); } catch(e) { return []; } }
+  function saveTodo(t){ localStorage.setItem('todo', JSON.stringify(t)); }
+  window.addTodo = function(){
     const inp = document.getElementById('todoInput');
     const txt = inp.value.trim(); if (!txt) return;
-    const t = loadTodo(); t.push({{text: txt, done: false, ts: Date.now()}});
+    const t = loadTodo(); t.push({text: txt, done: false, ts: Date.now()});
     saveTodo(t); inp.value = ''; renderTodo();
-  }};
-  window.toggleTodo = function(i){{ const t = loadTodo(); t[i].done = !t[i].done; saveTodo(t); renderTodo(); }};
-  window.delTodo = function(i){{ const t = loadTodo(); t.splice(i, 1); saveTodo(t); renderTodo(); }};
-  function renderTodo(){{
+  };
+  window.toggleTodo = function(i){ const t = loadTodo(); t[i].done = !t[i].done; saveTodo(t); renderTodo(); };
+  window.delTodo = function(i){ const t = loadTodo(); t.splice(i, 1); saveTodo(t); renderTodo(); };
+  function renderTodo(){
     const el = document.getElementById('todoList'); if (!el) return;
     const t = loadTodo();
-    if (!t.length) {{ el.innerHTML = '<div class="empty">Все задачи сделаны ✨</div>'; return; }}
+    if (!t.length) { el.innerHTML = '<div class="empty">Все задачи сделаны \u2728</div>'; return; }
     el.innerHTML = t.map((x, i) =>
       '<div class="todo-row">' +
       '<div class="todo-check ' + (x.done ? 'done' : '') + '" onclick="toggleTodo(' + i + ')">' + (x.done ? '✓' : '') + '</div>' +
       '<span class="todo-text ' + (x.done ? 'done' : '') + '" onclick="toggleTodo(' + i + ')">' + x.text.replace(/</g,'&lt;') + '</span>' +
       '<button class="habit-del" onclick="delTodo(' + i + ')">×</button></div>'
     ).join('');
-  }}
+  }
   renderTodo();
 
-  // ============ ЗАМЕТКИ ============
   const notesArea = document.getElementById('notesArea');
   const notesStatus = document.getElementById('notesStatus');
-  if (notesArea) {{
+  if (notesArea) {
     notesArea.value = localStorage.getItem('notes') || '';
     let notesTimer = null;
-    notesArea.addEventListener('input', () => {{
+    notesArea.addEventListener('input', () => {
       notesStatus.textContent = 'сохраняю...';
       clearTimeout(notesTimer);
-      notesTimer = setTimeout(() => {{
+      notesTimer = setTimeout(() => {
         localStorage.setItem('notes', notesArea.value);
-        notesStatus.textContent = '✓ сохранено ' + new Date().toLocaleTimeString('ru-RU', {{hour:'2-digit',minute:'2-digit'}});
-      }}, 600);
-    }});
-  }}
+        notesStatus.textContent = '✓ сохранено ' + new Date().toLocaleTimeString('ru-RU', {hour:'2-digit',minute:'2-digit'});
+      }, 600);
+    });
+  }
 
-  // ============ ПОМОДОРО ============
   let pomoSeconds = 25 * 60;
   let pomoRunning = false;
   let pomoInterval = null;
@@ -1742,148 +1731,143 @@ def get_js(weather_kind):
   const pomoTimeEl = document.getElementById('pomoTime');
   const pomoStartBtn = document.getElementById('pomoStart');
   const pomoCountEl = document.getElementById('pomoCount');
-  function pomoUpdate(){{
+  function pomoUpdate(){
     if (!pomoTimeEl) return;
     const m = Math.floor(pomoSeconds / 60); const s = pomoSeconds % 60;
     pomoTimeEl.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
     pomoTimeEl.style.color = pomoMode === 'work' ? 'var(--accent)' : 'var(--good)';
-  }}
-  window.pomoToggle = function(){{
-    if (pomoRunning) {{
+  }
+  window.pomoToggle = function(){
+    if (pomoRunning) {
       clearInterval(pomoInterval); pomoRunning = false;
       if (pomoStartBtn) pomoStartBtn.textContent = '▶ Старт';
-    }} else {{
+    } else {
       pomoRunning = true;
       if (pomoStartBtn) pomoStartBtn.textContent = '⏸ Пауза';
-      pomoInterval = setInterval(() => {{
+      pomoInterval = setInterval(() => {
         pomoSeconds--;
-        if (pomoSeconds <= 0) {{
+        if (pomoSeconds <= 0) {
           clearInterval(pomoInterval); pomoRunning = false;
           if (pomoStartBtn) pomoStartBtn.textContent = '▶ Старт';
-          if (pomoMode === 'work') {{
+          if (pomoMode === 'work') {
             pomoCount++; localStorage.setItem(pomoCountKey, pomoCount);
-            if (pomoCountEl) pomoCountEl.textContent = '🍅 сегодня: ' + pomoCount;
+            if (pomoCountEl) pomoCountEl.textContent = '\u{1F345} сегодня: ' + pomoCount;
             pomoMode = 'break'; pomoSeconds = 5 * 60;
-          }} else {{
+          } else {
             pomoMode = 'work'; pomoSeconds = 25 * 60;
-          }}
-          if (audioCtx) {{ try {{ beep(); beep(); }} catch(e){{}} }}
-        }}
+          }
+          if (audioCtx) { try { beep(); beep(); } catch(e){} }
+        }
         pomoUpdate();
-      }}, 1000);
-    }}
-  }};
-  window.pomoReset = function(){{
+      }, 1000);
+    }
+  };
+  window.pomoReset = function(){
     clearInterval(pomoInterval); pomoRunning = false;
     pomoMode = 'work'; pomoSeconds = 25 * 60;
     if (pomoStartBtn) pomoStartBtn.textContent = '▶ Старт';
     pomoUpdate();
-  }};
+  };
   pomoUpdate();
-  if (pomoCountEl) pomoCountEl.textContent = '🍅 сегодня: ' + pomoCount;
+  if (pomoCountEl) pomoCountEl.textContent = '\u{1F345} сегодня: ' + pomoCount;
 
-  // ============ НАСТРОЕНИЕ ============
   const moodKey = 'mood-' + todayKey();
-  function renderMood(){{
+  function renderMood(){
     const cur = localStorage.getItem(moodKey);
     const st = document.getElementById('moodStatus');
-    if (st) {{
-      const map = {{'good':'😄 Отлично','ok':'😐 Норм','bad':'😞 Плохо'}};
+    if (st) {
+      const map = {'good':'\u{1F604} Отлично','ok':'\u{1F610} Норм','bad':'\u{1F61E} Плохо'};
       st.textContent = 'Сегодня: ' + (cur ? map[cur] : '—');
-    }}
+    }
     document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
-    if (cur) {{
+    if (cur) {
       const el = document.querySelector('.mood-btn[onclick*="' + cur + '"]');
       if (el) el.classList.add('active');
-    }}
-  }}
-  window.setMood = function(m){{ localStorage.setItem(moodKey, m); renderMood(); }};
+    }
+  }
+  window.setMood = function(m){ localStorage.setItem(moodKey, m); renderMood(); };
   renderMood();
 
-  // ============ ВОДА ============
   const waterKey = 'water-' + todayKey();
-  function renderWater(){{
+  function renderWater(){
     const v = parseInt(localStorage.getItem(waterKey) || '0');
     const el = document.getElementById('waterGlass');
-    if (el) {{
-      const cups = '💧'.repeat(Math.min(v, 8));
+    if (el) {
+      const cups = '\u{1F4A7}'.repeat(Math.min(v, 8));
       el.textContent = v + ' / 8 ' + cups;
-    }}
-  }}
-  window.addWater = function(){{
+    }
+  }
+  window.addWater = function(){
     const v = parseInt(localStorage.getItem(waterKey) || '0') + 1;
     localStorage.setItem(waterKey, v); renderWater();
-  }};
-  window.resetWater = function(){{ localStorage.setItem(waterKey, '0'); renderWater(); }};
+  };
+  window.resetWater = function(){ localStorage.setItem(waterKey, '0'); renderWater(); };
   renderWater();
 
-  // ============ КОНВЕРТЕРЫ ============
-  window.convTemp = function(){{
+  window.convTemp = function(){
     const c = parseFloat(document.getElementById('convC').value);
     document.getElementById('convF').textContent = isNaN(c) ? '°F' : (c * 9 / 5 + 32).toFixed(1) + '°F';
-  }};
-  window.convDist = function(){{
+  };
+  window.convDist = function(){
     const km = parseFloat(document.getElementById('convKm').value);
     document.getElementById('convMi').textContent = isNaN(km) ? 'миль' : (km * 0.621371).toFixed(2) + ' миль';
-  }};
-  window.convWeight = function(){{
+  };
+  window.convWeight = function(){
     const kg = parseFloat(document.getElementById('convKg').value);
     document.getElementById('convLb').textContent = isNaN(kg) ? 'фунт' : (kg * 2.20462).toFixed(2) + ' фунт';
-  }};
-  window.convMoney = function(){{
+  };
+  window.convMoney = function(){
     const r = parseFloat(document.getElementById('convRub').value);
     const el = document.getElementById('convUsd');
-    if (isNaN(r)) {{ el.textContent = '$'; return; }}
+    if (isNaN(r)) { el.textContent = '$'; return; }
     el.textContent = '$' + (r / EXCH.usd).toFixed(2) + ' / €' + (r / EXCH.eur).toFixed(2);
-  }};
+  };
 
-  // ============ ПАРОЛЬ / QR ============
-  window.genPwd = function(){{
+  window.genPwd = function(){
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%^&*';
     let s = '';
     for (let i = 0; i < 20; i++) s += chars[Math.floor(Math.random() * chars.length)];
     const el = document.getElementById('pwdOut');
     el.textContent = s;
-    el.onclick = () => {{ navigator.clipboard.writeText(s); el.textContent = '✓ скопировано'; setTimeout(() => el.textContent = s, 1000); }};
-  }};
-  window.genQR = function(){{
+    el.onclick = () => { navigator.clipboard.writeText(s); el.textContent = '✓ скопировано'; setTimeout(() => el.textContent = s, 1000); };
+  };
+  window.genQR = function(){
     const box = document.getElementById('qrBox');
     box.innerHTML = '';
-    if (!window.QRCode) {{ box.textContent = 'QR-библиотека не загрузилась'; return; }}
-    new QRCode(box, {{text: location.href, width: 180, height: 180, colorDark: '#000', colorLight: '#fff'}});
-  }};
+    if (!window.QRCode) { box.textContent = 'QR-библиотека не загрузилась'; return; }
+    new QRCode(box, {text: location.href, width: 180, height: 180, colorDark: '#000', colorLight: '#fff'});
+  };
 
-  // ============ СЧЁТЧИКИ ДАТ ============
-  function loadDates() {{ try {{ return JSON.parse(localStorage.getItem('dates') || '[]'); }} catch(e) {{ return []; }} }}
-  function saveDates(d) {{ localStorage.setItem('dates', JSON.stringify(d)); }}
-  window.addDateCounter = function(){{
+  function loadDates(){ try { return JSON.parse(localStorage.getItem('dates') || '[]'); } catch(e) { return []; } }
+  function saveDates(d){ localStorage.setItem('dates', JSON.stringify(d)); }
+  window.addDateCounter = function(){
     const inp = document.getElementById('dateInput');
     const lbl = document.getElementById('dateLabel');
     if (!inp.value) return;
     const d = loadDates();
-    d.push({{date: inp.value, label: lbl.value.trim() || inp.value}});
+    d.push({date: inp.value, label: lbl.value.trim() || inp.value});
     saveDates(d); inp.value = ''; lbl.value = ''; renderDates();
-  }};
-  window.delDateCounter = function(i){{ const d = loadDates(); d.splice(i, 1); saveDates(d); renderDates(); }};
-  function renderDates(){{
+  };
+  window.delDateCounter = function(i){ const d = loadDates(); d.splice(i, 1); saveDates(d); renderDates(); };
+  function renderDates(){
     const el = document.getElementById('dateCounters'); if (!el) return;
     const d = loadDates();
-    if (!d.length) {{ el.innerHTML = '<div class="empty">Добавь важную дату</div>'; return; }}
+    if (!d.length) { el.innerHTML = '<div class="empty">Добавь важную дату</div>'; return; }
     const now = new Date(); now.setHours(0,0,0,0);
-    el.innerHTML = d.map((x, i) => {{
+    el.innerHTML = d.map((x, i) => {
       const target = new Date(x.date); target.setHours(0,0,0,0);
       const days = Math.round((target - now) / 86400000);
-      const label = days > 0 ? 'через ' + days + ' дн.' : (days < 0 ? Math.abs(days) + ' дн. назад' : 'сегодня 🎉');
-      const emoji = days === 0 ? '🎉' : (days > 0 ? '⏳' : '📅');
+      const label = days > 0 ? 'через ' + days + ' дн.' : (days < 0 ? Math.abs(days) + ' дн. назад' : 'сегодня \u{1F389}');
+      const emoji = days === 0 ? '\u{1F389}' : (days > 0 ? '\u23F3' : '\u{1F4C5}');
       return '<div class="date-row">' +
         '<span class="date-label-txt">' + emoji + ' ' + x.label.replace(/</g,'&lt;') + '</span>' +
         '<span class="date-days">' + label + '</span>' +
         '<button class="date-del" onclick="delDateCounter(' + i + ')">×</button></div>';
-    }}).join('');
-  }}
+    }).join('');
+  }
   renderDates();
-}})();
-'''
+})();'''
+    return js.replace('__KIND__', weather_kind)
 
 
 if __name__ == '__main__':
